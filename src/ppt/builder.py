@@ -262,30 +262,38 @@ def _page_cover(prs, result: PredictionResult) -> None:
         font_size=Pt(16), color=WHITE, font_name=FONT_CN_BODY,
     )
 
-    # Recommended pick
+    # Recommended pick + predicted score
     pick = result.recommended_pick
     pick_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
     pick_en = team_a.name_en if pick == "A" else (team_b.name_en if pick == "B" else "Draw")
+    predicted_score = result.monte_carlo.predicted_score
+    score_a, score_b = result.monte_carlo.split_goals(predicted_score)
+    # If our consensus pick disagrees with the score, fall back to the
+    # score's own outcome (so the cover tells one consistent story).
+    if (pick == "A" and score_a < score_b) or (pick == "B" and score_b < score_a):
+        pick = result.monte_carlo.score_outcome(predicted_score)
+        pick_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
+        pick_en = team_a.name_en if pick == "A" else (team_b.name_en if pick == "B" else "Draw")
     _add_panel(slide, MARGIN, Inches(4.6), Inches(6.2), Inches(2.1), fill=BG_PANEL)
     _add_textbox(
         slide, MARGIN + Inches(0.3), Inches(4.75), Inches(6), Inches(0.4),
-        "推荐结果  ·  RECOMMENDED PICK", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True,
+        "预测比分  ·  PREDICTED SCORE", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True,
     )
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(5.1), Inches(6), Inches(0.8),
-        pick_zh, font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_CN_BODY,
+        slide, MARGIN + Inches(0.3), Inches(5.05), Inches(6), Inches(1.0),
+        predicted_score, font_size=Pt(64), bold=True, color=WHITE, font_name=FONT_MONO, align=PP_ALIGN.LEFT,
     )
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(5.85), Inches(6), Inches(0.4),
-        pick_en, font_size=Pt(16), color=GOLD, font_name=FONT_TITLE,
+        slide, MARGIN + Inches(0.3), Inches(5.95), Inches(6), Inches(0.35),
+        f"推荐结果：{pick_zh} ({pick_en})", font_size=Pt(15), color=GOLD, font_name=FONT_CN_BODY,
     )
     conf = result.confidence
     conf_color = GREEN if conf == "high" else (GOLD if conf == "medium" else RED)
     conf_zh = "高" if conf == "high" else "中" if conf == "medium" else "低"
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(6.25), Inches(6), Inches(0.4),
+        slide, MARGIN + Inches(0.3), Inches(6.30), Inches(6), Inches(0.35),
         f"信心指数：{conf_zh}（{conf.upper()}）",
-        font_size=Pt(13), color=conf_color, font_name=FONT_CN_BODY, bold=True,
+        font_size=Pt(12), color=conf_color, font_name=FONT_CN_BODY, bold=True,
     )
 
     # Right side: probability numbers
@@ -335,11 +343,22 @@ def _page_summary(prs, result: PredictionResult) -> None:
     p = result.model_probs.consensus
     team_a = result.match.team_a
     team_b = result.match.team_b
+    predicted_score = result.monte_carlo.predicted_score
+    score_a, score_b = result.monte_carlo.split_goals(predicted_score)
 
-    # Three big number cards
-    y = Inches(1.4)
+    # Big predicted score callout
+    _add_panel(slide, MARGIN, Inches(1.4), Inches(12.1), Inches(1.7), fill=BG_PANEL)
+    _add_textbox(slide, MARGIN + Inches(0.4), Inches(1.55), Inches(12), Inches(0.4),
+                "预测比分  ·  PREDICTED SCORE", font_size=Pt(12), color=GOLD,
+                font_name=FONT_CN_BODY, bold=True)
+    _add_textbox(slide, MARGIN, Inches(2.0), Inches(12.1), Inches(1.1),
+                predicted_score, font_size=Pt(72), bold=True, color=WHITE,
+                font_name=FONT_MONO, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+
+    # Three probability cards
+    y = Inches(3.3)
     card_w = Inches(4.0)
-    card_h = Inches(2.2)
+    card_h = Inches(2.0)
     for i, (label_zh, val, color, team_zh) in enumerate([
         (f"{team_a.name_zh} 胜", p[0], GREEN, team_a.name_zh),
         ("平局", p[1], GREY, "—"),
@@ -347,47 +366,34 @@ def _page_summary(prs, result: PredictionResult) -> None:
     ]):
         x = MARGIN + i * (card_w + Inches(0.15))
         _add_panel(slide, x, y, card_w, card_h, fill=BG_PANEL)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(0.2), card_w - Inches(0.6), Inches(0.4),
-                    label_zh, font_size=Pt(16), color=color, bold=True, font_name=FONT_CN_BODY)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(0.7), card_w - Inches(0.6), Inches(0.3),
+        _add_textbox(slide, x + Inches(0.3), y + Inches(0.15), card_w - Inches(0.6), Inches(0.4),
+                    label_zh, font_size=Pt(15), color=color, bold=True, font_name=FONT_CN_BODY)
+        _add_textbox(slide, x + Inches(0.3), y + Inches(0.6), card_w - Inches(0.6), Inches(0.3),
                     team_zh, font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(1.05), card_w - Inches(0.6), Inches(1.0),
-                    f"{val:.0%}", font_size=Pt(54), bold=True, color=color, font_name=FONT_MONO)
+        _add_textbox(slide, x + Inches(0.3), y + Inches(0.95), card_w - Inches(0.6), Inches(0.95),
+                    f"{val:.0%}", font_size=Pt(44), bold=True, color=color, font_name=FONT_MONO)
 
     # Recommended pick + expected goals
-    y2 = Inches(3.9)
-    _add_panel(slide, MARGIN, y2, Inches(6.2), Inches(1.6), fill=BG_PANEL)
-    _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(0.2), Inches(6), Inches(0.3),
-                "推荐结果  ·  RECOMMENDED PICK", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+    y2 = Inches(5.5)
     pick = result.recommended_pick
     pick_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
     conf_zh = "高" if result.confidence == "high" else "中" if result.confidence == "medium" else "低"
-    _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(0.55), Inches(6), Inches(0.6),
-                pick_zh, font_size=Pt(32), bold=True, color=WHITE, font_name=FONT_CN_BODY)
-    _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(1.15), Inches(6), Inches(0.4),
+    _add_panel(slide, MARGIN, y2, Inches(6.2), Inches(1.4), fill=BG_CARD)
+    _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(0.15), Inches(6), Inches(0.3),
+                "推荐结果  ·  RECOMMENDED PICK", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+    _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(0.5), Inches(6), Inches(0.55),
+                pick_zh, font_size=Pt(28), bold=True, color=WHITE, font_name=FONT_CN_BODY)
+    _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(1.05), Inches(6), Inches(0.3),
                 f"信心指数：{conf_zh}  ·  Confidence: {result.confidence.upper()}",
                 font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
 
-    _add_panel(slide, MARGIN + Inches(6.5), y2, Inches(5.6), Inches(1.6), fill=BG_PANEL)
-    _add_textbox(slide, MARGIN + Inches(6.8), y2 + Inches(0.2), Inches(5), Inches(0.3),
-                "预期比分  ·  EXPECTED SCORE", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+    _add_panel(slide, MARGIN + Inches(6.5), y2, Inches(5.6), Inches(1.4), fill=BG_CARD)
+    _add_textbox(slide, MARGIN + Inches(6.8), y2 + Inches(0.15), Inches(5), Inches(0.3),
+                "预期进球（期望值）  ·  EXPECTED GOALS", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     eg = result.model_probs.expected_goals
-    _add_textbox(slide, MARGIN + Inches(6.8), y2 + Inches(0.6), Inches(5), Inches(0.9),
+    _add_textbox(slide, MARGIN + Inches(6.8), y2 + Inches(0.5), Inches(5), Inches(0.7),
                 f"{eg[0]:.1f}  —  {eg[1]:.1f}",
-                font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
-
-    # Top 5 likely scores
-    y3 = Inches(5.7)
-    _add_textbox(slide, MARGIN, y3, Inches(12), Inches(0.4),
-                "最可能比分 TOP 5  ·  TOP 5 LIKELY SCORES", font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY)
-    top = result.monte_carlo.top_scores[:5]
-    for i, (score, prob) in enumerate(top):
-        x = MARGIN + i * Inches(2.45)
-        _add_panel(slide, x, y3 + Inches(0.5), Inches(2.35), Inches(0.9), fill=BG_CARD)
-        _add_textbox(slide, x, y3 + Inches(0.55), Inches(2.35), Inches(0.5),
-                    score, font_size=Pt(24), bold=True, color=WHITE, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
-        _add_textbox(slide, x, y3 + Inches(1.05), Inches(2.35), Inches(0.3),
-                    f"{prob:.1%}", font_size=Pt(10), color=GOLD, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
+                font_size=Pt(32), bold=True, color=WHITE, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
 
 
 def _page_team_profile(prs, result: PredictionResult) -> None:
@@ -820,19 +826,20 @@ def _page_final(prs, result: PredictionResult) -> None:
     team_a = result.match.team_a
     team_b = result.match.team_b
     pick = result.recommended_pick
+    predicted_score = result.monte_carlo.predicted_score
+    score_a, score_b = result.monte_carlo.split_goals(predicted_score)
 
-    # Big result banner
+    # Big result banner: predicted score as headline
     _add_panel(slide, MARGIN, Inches(1.4), Inches(12.1), Inches(2.0), fill=BG_PANEL)
     pick_label_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
-    pick_label_en = team_a.name_en if pick == "A" else (team_b.name_en if pick == "B" else "Draw")
     _add_textbox(slide, MARGIN + Inches(0.5), Inches(1.55), Inches(11), Inches(0.4),
-                "最终预测  ·  FINAL PREDICTION", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
-    _add_textbox(slide, MARGIN + Inches(0.5), Inches(2.0), Inches(11), Inches(0.8),
-                f"{pick_label_zh}  ({pick_label_en})", font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_CN_BODY)
-    eg = result.model_probs.expected_goals
-    _add_textbox(slide, MARGIN + Inches(0.5), Inches(2.8), Inches(11), Inches(0.5),
-                f"预期比分  ·  Expected Score:  {eg[0]:.1f}  —  {eg[1]:.1f}",
-                font_size=Pt(16), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+                "最终预测比分  ·  FINAL PREDICTED SCORE", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+    _add_textbox(slide, MARGIN, Inches(2.0), Inches(12.1), Inches(1.1),
+                predicted_score, font_size=Pt(80), bold=True, color=WHITE, font_name=FONT_MONO,
+                align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    _add_textbox(slide, MARGIN + Inches(0.5), Inches(3.05), Inches(11), Inches(0.35),
+                f"推荐结果：{pick_label_zh}    ·    最可能比分出现概率 {result.monte_carlo.top_scores[0][1]:.1%}",
+                font_size=Pt(14), color=GOLD, font_name=FONT_CN_BODY, bold=True, align=PP_ALIGN.CENTER)
 
     # Confidence + risks
     conf_color = GREEN if result.confidence == "high" else (GOLD if result.confidence == "medium" else RED)
@@ -841,14 +848,15 @@ def _page_final(prs, result: PredictionResult) -> None:
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(3.85), Inches(5.5), Inches(0.4),
                 "信心指数  ·  CONFIDENCE", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(4.3), Inches(5.5), Inches(1.0),
-                f"{conf_zh}  ·  {result.confidence.upper()}", font_size=Pt(44), bold=True, color=conf_color, font_name=FONT_CN_BODY)
+                f"{conf_zh}  ·  {result.confidence.upper()}", font_size=Pt(40), bold=True, color=conf_color, font_name=FONT_CN_BODY)
     p = result.model_probs.consensus
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(5.3), Inches(5.5), Inches(0.4),
                 f"胜 {p[0]:.0%}  ·  平 {p[1]:.0%}  ·  负 {p[2]:.0%}",
                 font_size=Pt(12), color=WHITE, font_name=FONT_CN_BODY)
+    eg = result.model_probs.expected_goals
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(5.6), Inches(5.5), Inches(0.4),
-                f"最可能比分：{result.monte_carlo.top_scores[0][0]}  （{result.monte_carlo.top_scores[0][1]:.1%}）  ·  Top Score",
-                font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
+                f"预期进球（期望值）  ·  xG:  {eg[0]:.1f}  —  {eg[1]:.1f}",
+                font_size=Pt(11), color=GREY, font_name=FONT_CN_BODY)
 
     # Risks
     _add_panel(slide, MARGIN + Inches(6.2), Inches(3.7), Inches(5.9), Inches(3.2), fill=BG_CARD)

@@ -131,6 +131,34 @@ class MonteCarloResult(BaseModel):
     extra_time_prob: float = 0.0
     penalties_prob: float = 0.0
 
+    @property
+    def predicted_score(self) -> str:
+        """The single most likely exact score, e.g. '2-1'."""
+        if self.top_scores:
+            return self.top_scores[0][0]
+        # Fallback: derive from expected goals in distribution
+        if not self.distribution:
+            return "0-0"
+        return max(self.distribution.items(), key=lambda kv: kv[1])[0]
+
+    def split_goals(self, score: str | None = None) -> tuple[int, int]:
+        """Parse a 'a-b' score string into (goals_a, goals_b)."""
+        s = score or self.predicted_score
+        try:
+            a, b = s.split("-")
+            return int(a), int(b)
+        except Exception:
+            return 0, 0
+
+    def score_outcome(self, score: str | None = None) -> str:
+        """Return 'A', 'B', or 'draw' for the parsed score."""
+        a, b = self.split_goals(score)
+        if a > b:
+            return "A"
+        if b > a:
+            return "B"
+        return "draw"
+
 
 class Matchup(BaseModel):
     title_zh: str
