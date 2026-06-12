@@ -328,8 +328,8 @@ def _page_team_profile(prs, result: PredictionResult) -> None:
 
     headers_zh = ["FIFA 排名", "ELO 评分", "主教练", "队长", "所属足联", "主队服颜色"]
     headers_en = ["FIFA Rank", "ELO Rating", "Head Coach", "Captain", "Confederation", "Kit Color"]
-    a_vals = [f"#{team_a.fifa_ranking}", f"{team_a.elo:.0f}", team_a.coach, team_a.captain, team_a.confederation, ""]
-    b_vals = [f"#{team_b.fifa_ranking}", f"{team_b.elo:.0f}", team_b.coach, team_b.captain, team_b.confederation, ""]
+    a_vals = [f"#{team_a.fifa_ranking}", f"{team_a.elo:.0f}", team_a.coach_zh or team_a.coach, team_a.captain_zh or team_a.captain, team_a.confederation, ""]
+    b_vals = [f"#{team_b.fifa_ranking}", f"{team_b.elo:.0f}", team_b.coach_zh or team_b.coach, team_b.captain_zh or team_b.captain, team_b.confederation, ""]
 
     y = Inches(1.5)
     for i, (h_zh, h_en, va, vb) in enumerate(zip(headers_zh, headers_en, a_vals, b_vals)):
@@ -460,7 +460,7 @@ def _page_predicted_lineup(prs, result: PredictionResult, side: str = "A") -> No
                     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, font_name=FONT_MONO)
         # name + pos
         _add_textbox(slide, x + Inches(0.7), y + Inches(0.05), Inches(2.0), Inches(0.4),
-                    p.name, font_size=Pt(11), bold=True, color=WHITE, font_name=FONT_CN_BODY)
+                    p.display_name_cn(), font_size=Pt(11), bold=True, color=WHITE, font_name=FONT_CN_BODY)
         _add_textbox(slide, x + Inches(0.7), y + Inches(0.4), Inches(2.0), Inches(0.3),
                     f"{p.position}  ·  {p.club}", font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY)
         # rating
@@ -523,7 +523,7 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
             card_path = render_player_card(p, size=(200, 280), kit_color="#FFB627")
             slide.shapes.add_picture(str(card_path), px, py, width=Inches(1.6), height=Inches(1.6))
             _add_textbox(slide, px, py + Inches(1.6), Inches(1.6), Inches(0.25),
-                        p.name, font_size=Pt(9), color=WHITE, align=PP_ALIGN.CENTER, font_name=FONT_CN_BODY)
+                        p.display_name_cn(), font_size=Pt(9), color=WHITE, align=PP_ALIGN.CENTER, font_name=FONT_CN_BODY)
             _add_textbox(slide, px, py + Inches(1.78), Inches(1.6), Inches(0.2),
                         p.position, font_size=Pt(8), color=GREY, align=PP_ALIGN.CENTER, font_name=FONT_CN_BODY)
 
@@ -535,8 +535,8 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
         sx = x + Inches(3.5)
         sy = y + Inches(0.95)
         _add_textbox(slide, sx, sy - Inches(0.35), Inches(3.0), Inches(0.25),
-                    mu.player_a.name + "  vs  " + mu.player_b.name, font_size=Pt(8), color=GREY,
-                    font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
+                    mu.player_a.display_name_cn() + "  vs  " + mu.player_b.display_name_cn(),
+                    font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
         for k, (zh, en, va, vb) in enumerate(mu.stat_pairs):
             row_y = sy + Inches(k * 0.27)
             try:

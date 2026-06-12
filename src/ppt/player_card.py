@@ -99,23 +99,22 @@ def render_player_card(player: Player, size: tuple[int, int] = (320, 440), kit_c
     else:
         _draw_monogram(draw, portrait_box, player)
 
-    # Name
-    f_name = _load_font(22, bold=True)
-    name = player.name
-    if len(name) > 16:
+    # Name (Chinese primary, English as smaller subtitle)
+    f_name_cn = _load_font(22, bold=True)
+    f_name_en = _load_font(13, bold=False)
+    name_cn = player.name_zh or player.name
+    if len(name_cn) > 8:
         # split into two lines
-        words = name.split(" ")
-        if len(words) > 1 and len(words[0]) <= 12:
-            line1 = words[0]
-            line2 = " ".join(words[1:])
-        else:
-            mid = len(name) // 2
-            line1 = name[:mid]
-            line2 = name[mid:]
-        draw.text((size[0] // 2, 300), line1, fill="#F5F7FA", font=f_name, anchor="mm")
-        draw.text((size[0] // 2, 326), line2, fill="#F5F7FA", font=f_name, anchor="mm")
+        mid = len(name_cn) // 2
+        line1 = name_cn[:mid]
+        line2 = name_cn[mid:]
+        draw.text((size[0] // 2, 300), line1, fill="#F5F7FA", font=f_name_cn, anchor="mm")
+        draw.text((size[0] // 2, 326), line2, fill="#F5F7FA", font=f_name_cn, anchor="mm")
     else:
-        draw.text((size[0] // 2, 313), name, fill="#F5F7FA", font=f_name, anchor="mm")
+        draw.text((size[0] // 2, 313), name_cn, fill="#F5F7FA", font=f_name_cn, anchor="mm")
+    # English name as small subtitle
+    if player.name_zh and player.name_zh != player.name:
+        draw.text((size[0] // 2, 348), player.name, fill="#9AB0C8", font=f_name_en, anchor="mm")
 
     # Stats grid
     f_stat_label = _load_font(11, bold=False)
@@ -153,11 +152,14 @@ def _draw_monogram(draw: ImageDraw.ImageDraw, box, player: Player) -> None:
     radius = (box[2] - box[0]) // 2 - 10
     pos_color = POSITION_COLORS.get(player.position, "#9AB0C8")
     draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=pos_color, outline="#FFB627", width=3)
-    # initials
-    parts = player.name.split()
-    if len(parts) >= 2:
-        initials = (parts[0][0] + parts[-1][0]).upper()
+    # Use last 1-2 characters of Chinese name (surname)
+    if player.name_zh:
+        initials = player.name_zh[-1] if len(player.name_zh) > 1 else player.name_zh
     else:
-        initials = player.name[:2].upper()
+        parts = player.name.split()
+        if len(parts) >= 2:
+            initials = (parts[0][0] + parts[-1][0]).upper()
+        else:
+            initials = player.name[:2].upper()
     f = _load_font(72, bold=True)
     draw.text((cx, cy), initials, fill="#0A1628", font=f, anchor="mm")

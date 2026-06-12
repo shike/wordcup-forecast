@@ -5,7 +5,9 @@
     "fifa_ranking": 5,
     "confederation": "CONMEBOL",
     "coach": "Dorival Júnior",
+    "coach_zh": "多里瓦尔·儒尼奥尔",
     "captain": "Marquinhos",
+    "captain_zh": "马尔基尼奥斯",
     "elo": 1980,
     "home_kit_color": "#FFDF00"
   },
@@ -15,7 +17,9 @@
     "fifa_ranking": 1,
     "confederation": "CONMEBOL",
     "coach": "Lionel Scaloni",
+    "coach_zh": "Lionel Scaloni",
     "captain": "Lionel Messi",
+    "captain_zh": "利昂内尔·梅西",
     "elo": 2130,
     "home_kit_color": "#75AADB"
   },
@@ -25,7 +29,9 @@
     "fifa_ranking": 2,
     "confederation": "UEFA",
     "coach": "Didier Deschamps",
+    "coach_zh": "迪迪埃·德尚",
     "captain": "Kylian Mbappé",
+    "captain_zh": "基利安·姆巴佩",
     "elo": 2050,
     "home_kit_color": "#002395"
   },
@@ -35,7 +41,9 @@
     "fifa_ranking": 4,
     "confederation": "UEFA",
     "coach": "Thomas Tuchel",
+    "coach_zh": "托马斯·图赫尔",
     "captain": "Harry Kane",
+    "captain_zh": "哈里·凯恩",
     "elo": 1990,
     "home_kit_color": "#FFFFFF"
   },
@@ -45,7 +53,9 @@
     "fifa_ranking": 9,
     "confederation": "UEFA",
     "coach": "Julian Nagelsmann",
+    "coach_zh": "尤利安·纳格尔斯曼",
     "captain": "Joshua Kimmich",
+    "captain_zh": "约书亚·基米希",
     "elo": 1945,
     "home_kit_color": "#FFFFFF"
   },
@@ -55,7 +65,9 @@
     "fifa_ranking": 3,
     "confederation": "UEFA",
     "coach": "Luis de la Fuente",
+    "coach_zh": "路易斯·德拉富恩特",
     "captain": "Rodri",
+    "captain_zh": "罗德里",
     "elo": 2025,
     "home_kit_color": "#AA151B"
   },
@@ -65,7 +77,9 @@
     "fifa_ranking": 6,
     "confederation": "UEFA",
     "coach": "Roberto Martínez",
+    "coach_zh": "罗伯托·马丁内斯",
     "captain": "Cristiano Ronaldo",
+    "captain_zh": "克里斯蒂亚诺·罗纳尔多",
     "elo": 1970,
     "home_kit_color": "#FF0000"
   },
@@ -75,7 +89,9 @@
     "fifa_ranking": 7,
     "confederation": "UEFA",
     "coach": "Ronald Koeman",
+    "coach_zh": "罗纳德·科曼",
     "captain": "Virgil van Dijk",
+    "captain_zh": "维吉尔·范戴克",
     "elo": 1965,
     "home_kit_color": "#FF6600"
   },
@@ -85,7 +101,9 @@
     "fifa_ranking": 11,
     "confederation": "UEFA",
     "coach": "Luciano Spalletti",
+    "coach_zh": "卢西亚诺·斯帕莱蒂",
     "captain": "Gianluigi Donnarumma",
+    "captain_zh": "吉安路易吉·多纳鲁马",
     "elo": 1880,
     "home_kit_color": "#0066CC"
   },
@@ -95,7 +113,9 @@
     "fifa_ranking": 16,
     "confederation": "CONCACAF",
     "coach": "Mauricio Pochettino",
+    "coach_zh": "毛里西奥·波切蒂诺",
     "captain": "Christian Pulisic",
+    "captain_zh": "克里斯蒂安·普利西奇",
     "elo": 1820,
     "home_kit_color": "#FFFFFF"
   },
@@ -105,29 +125,11 @@
     "fifa_ranking": 27,
     "confederation": "CONCACAF",
     "coach": "Jesse Marsch",
+    "coach_zh": "杰西·马什",
     "captain": "Alphonso Davies",
+    "captain_zh": "阿方索·戴维斯",
     "elo": 1740,
     "home_kit_color": "#FF0000"
-  },
-  "BIH": {
-    "name_en": "Bosnia-Herzegovina",
-    "name_zh": "波黑",
-    "fifa_ranking": 71,
-    "confederation": "UEFA",
-    "coach": "Sergej Barbarez",
-    "captain": "Edin Džeko",
-    "elo": 1540,
-    "home_kit_color": "#002395"
-  },
-  "PAR": {
-    "name_en": "Paraguay",
-    "name_zh": "巴拉圭",
-    "fifa_ranking": 42,
-    "confederation": "CONMEBOL",
-    "coach": "Alfaro Alfaro",
-    "captain": "Gustavo Gómez",
-    "elo": 1610,
-    "home_kit_color": "#D52B1E"
   },
   "MEX": {
     "name_en": "Mexico",
@@ -135,7 +137,9 @@
     "fifa_ranking": 14,
     "confederation": "CONCACAF",
     "coach": "Javier Aguirre",
+    "coach_zh": "哈维尔·阿吉雷",
     "captain": "Guillermo Ochoa",
+    "captain_zh": "吉列尔莫·奥乔亚",
     "elo": 1850,
     "home_kit_color": "#006847"
   },
@@ -145,7 +149,9 @@
     "fifa_ranking": 18,
     "confederation": "AFC",
     "coach": "Hajime Moriyasu",
+    "coach_zh": "森保一",
     "captain": "Wataru Endo",
+    "captain_zh": "远藤航",
     "elo": 1810,
     "home_kit_color": "#BC002D"
   },
@@ -155,7 +161,9 @@
     "fifa_ranking": 22,
     "confederation": "AFC",
     "coach": "Hong Myung-bo",
+    "coach_zh": "洪明甫",
     "captain": "Son Heung-min",
+    "captain_zh": "孙兴慜",
     "elo": 1750,
     "home_kit_color": "#CD2E3A"
   },
@@ -165,7 +173,9 @@
     "fifa_ranking": 24,
     "confederation": "AFC",
     "coach": "Tony Popovic",
+    "coach_zh": "托尼·波波维奇",
     "captain": "Mathew Leckie",
+    "captain_zh": "马修·莱基",
     "elo": 1730,
     "home_kit_color": "#FFCD00"
   },
@@ -175,7 +185,9 @@
     "fifa_ranking": 12,
     "confederation": "CAF",
     "coach": "Walid Regragui",
+    "coach_zh": "瓦利德·雷格拉吉",
     "captain": "Achraf Hakimi",
+    "captain_zh": "阿什拉夫·哈基米",
     "elo": 1870,
     "home_kit_color": "#C1272D"
   },
@@ -185,7 +197,9 @@
     "fifa_ranking": 8,
     "confederation": "UEFA",
     "coach": "Domenico Tedesco",
+    "coach_zh": "多梅尼科·特德斯科",
     "captain": "Kevin De Bruyne",
+    "captain_zh": "凯文·德布劳内",
     "elo": 1955,
     "home_kit_color": "#C8102E"
   },
@@ -195,7 +209,9 @@
     "fifa_ranking": 33,
     "confederation": "CAF",
     "coach": "Hossam Hassan",
+    "coach_zh": "霍萨姆·哈桑",
     "captain": "Mohamed Salah",
+    "captain_zh": "穆罕默德·萨拉赫",
     "elo": 1700,
     "home_kit_color": "#CE1126"
   },
@@ -205,9 +221,35 @@
     "fifa_ranking": 38,
     "confederation": "CAF",
     "coach": "Pedro Leitão",
+    "coach_zh": "佩德罗·莱唐",
     "captain": "Ryan Mendes",
+    "captain_zh": "瑞安·门德斯",
     "elo": 1640,
     "home_kit_color": "#003893"
+  },
+  "BIH": {
+    "name_en": "Bosnia-Herzegovina",
+    "name_zh": "波黑",
+    "fifa_ranking": 71,
+    "confederation": "UEFA",
+    "coach": "Sergej Barbarez",
+    "coach_zh": "塞尔盖·巴巴雷茨",
+    "captain": "Edin Džeko",
+    "captain_zh": "埃丁·哲科",
+    "elo": 1540,
+    "home_kit_color": "#002395"
+  },
+  "PAR": {
+    "name_en": "Paraguay",
+    "name_zh": "巴拉圭",
+    "fifa_ranking": 42,
+    "confederation": "CONMEBOL",
+    "coach": "Alfaro Alfaro",
+    "coach_zh": "阿尔法罗",
+    "captain": "Gustavo Gómez",
+    "captain_zh": "古斯塔沃·戈麦斯",
+    "elo": 1610,
+    "home_kit_color": "#D52B1E"
   },
   "SEN": {
     "name_en": "Senegal",
@@ -215,7 +257,9 @@
     "fifa_ranking": 19,
     "confederation": "CAF",
     "coach": "Aliou Cissé",
+    "coach_zh": "阿利乌·西塞",
     "captain": "Kalidou Koulibaly",
+    "captain_zh": "卡利杜·库利巴利",
     "elo": 1790,
     "home_kit_color": "#00853F"
   }

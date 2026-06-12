@@ -55,20 +55,29 @@ def _make_player(data: dict) -> Player:
     )
 
 
-# Placeholder squad when no seed JSON exists — generic names but unique enough
-# to render distinct cards.
+# Placeholder squad when no seed JSON exists — Chinese transliterated names
+# as a sensible default so the PPT reads naturally.
 
-_PLACEHOLDER_NAMES = [
-    "Aaronson", "Berger", "Carlsen", "Dahlberg", "Eklund", "Forsberg",
-    "Gustafsson", "Holmberg", "Iversen", "Jakobsen", "Karlsson", "Lindgren",
-    "Magnusson", "Nordström", "Olsson", "Pettersson", "Quist", "Rosenberg",
-    "Sandberg", "Thorstvedt", "Ullmark", "Vikström", "Wahlberg", "Yngvesson",
-    "Zetterberg",
+_PLACEHOLDER_FIRST_ZH = [
+    "亚历克斯", "本", "卡洛斯", "丹尼尔", "埃米利奥", "费尔南多",
+    "加布里埃尔", "胡安", "路易斯", "马蒂亚斯", "尼古拉斯", "奥斯卡",
+    "帕布罗", "拉斐尔", "圣地亚哥", "托马斯", "乌戈", "维克多",
+    "哈维尔", "伊万", "泽维尔", "迭戈", "罗德里戈", "马丁",
+    "塞尔吉奥", "马尔科", "里卡多", "安德烈", "克里斯蒂安",
+]
+
+_PLACEHOLDER_LAST_ZH = [
+    "加西亚", "罗德里格斯", "马丁内斯", "洛佩斯", "冈萨雷斯",
+    "佩雷斯", "桑切斯", "罗梅罗", "索萨", "阿尔梅达", "纳达尔",
+    "托雷斯", "弗洛雷斯", "奥尔蒂斯", "莫拉", "古铁雷斯",
+    "卡瓦哈尔", "卡斯特罗", "莫雷诺", "希门尼斯", "德尔加多",
+    "桑托斯", "门德斯", "里贝罗", "库尼亚", "帕切科",
 ]
 
 _PLACEHOLDER_CLUBS = [
-    "Real Madrid", "Man City", "Bayern", "PSG", "Barcelona", "Liverpool",
-    "Inter", "Juventus", "Arsenal", "Atletico",
+    "Real Madrid 皇家马德里", "Man City 曼城", "Bayern 拜仁", "PSG 巴黎圣日耳曼",
+    "Barcelona 巴塞罗那", "Liverpool 利物浦", "Inter 国际米兰", "Juventus 尤文图斯",
+    "Arsenal 阿森纳", "Atletico 马竞",
 ]
 
 
@@ -84,14 +93,15 @@ def _generate_placeholder_squad(team_code: str) -> list[Player]:
     ]
     players: list[Player] = []
     for i, pos in enumerate(positions):
-        first = rng.choice(_PLACEHOLDER_NAMES)
-        last = rng.choice(_PLACEHOLDER_NAMES)
-        name = f"{first} {last}"
+        first_zh = rng.choice(_PLACEHOLDER_FIRST_ZH)
+        last_zh = rng.choice(_PLACEHOLDER_LAST_ZH)
+        name_zh = f"{first_zh}·{last_zh}"
+        name_en = f"{first_zh} {last_zh}"
         players.append(
             Player(
-                id=player_id_from_name(name),
-                name=name,
-                name_zh=None,
+                id=player_id_from_name(name_zh),
+                name=name_en,
+                name_zh=name_zh,
                 position=pos,
                 number=i + 1,
                 age=rng.randint(20, 33),

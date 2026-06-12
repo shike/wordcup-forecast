@@ -79,10 +79,11 @@ def draw_pitch_with_lineup(lineup: Lineup, save_path: Path, kit_color: str = "#F
         ax.text(x, y, str(player.number or ""), color="#0A1628", ha="center", va="center", fontsize=11, weight="bold", zorder=4)
         # position label above
         ax.text(x, min(y + 0.055, 0.97), slot, color="#9AB0C8", ha="center", va="bottom", fontsize=8, zorder=4)
-        # name below
-        name = player.name
-        if len(name) > 12:
-            name = name.split()[-1]
+        # name below (Chinese primary)
+        name = player.display_name_cn()
+        if len(name) > 6:
+            # truncate intelligently (keep first 5 chars)
+            name = name[:5] + "…"
         ax.text(x, max(y - 0.055, 0.02), name, color="#F5F7FA", ha="center", va="top", fontsize=9, zorder=4)
 
     if title:

@@ -13,7 +13,9 @@ class Team(BaseModel):
     fifa_ranking: int
     elo: float
     coach: str
+    coach_zh: str = ""
     captain: str
+    captain_zh: str = ""
     home_kit_color: str = "#FFFFFF"
     confederation: str = ""
 
@@ -41,7 +43,13 @@ class Player(BaseModel):
             return self.name_zh
         if lang == "en":
             return self.name
-        return f"{self.name_zh or self.name} / {self.name}"
+        # bilingual: Chinese first (or fallback to English if no name_zh)
+        primary = self.name_zh or self.name
+        return f"{primary}  ·  {self.name}"
+
+    def display_name_cn(self) -> str:
+        """Return the Chinese name, falling back to English if not available."""
+        return self.name_zh or self.name
 
 
 class Formation(BaseModel):
