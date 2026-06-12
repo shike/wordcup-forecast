@@ -18,15 +18,50 @@ from PIL import Image, ImageDraw, ImageFont
 from src.utils.models import Player
 
 
-# Try to load a TrueType font; fall back to default if missing
-def _load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    candidates = [
-        "/System/Library/Fonts/Helvetica.ttc",
-        "/System/Library/Fonts/SFNSDisplay.ttf",
-        "/Library/Fonts/Arial.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "C:\\Windows\\Fonts\\arialbd.ttf" if bold else "C:\\Windows\\Fonts\\arial.ttf",
-    ]
+# Font loading with CJK + Latin font chain.
+# We try multiple CJK-capable fonts on each OS so cards render properly
+# wherever the program runs.
+
+_CJK_FONT_CANDIDATES = [
+    # macOS
+    "/System/Library/Fonts/PingFang.ttc",
+    "/System/Library/Fonts/STHeiti Medium.ttc",
+    "/System/Library/Fonts/STHeiti Light.ttc",
+    "/Library/Fonts/Arial Unicode.ttf",
+    # Windows
+    "C:\\Windows\\Fonts\\msyh.ttc",
+    "C:\\Windows\\Fonts\\msyh.ttf",
+    "C:\\Windows\\Fonts\\simhei.ttf",
+    "C:\\Windows\\Fonts\\simsun.ttc",
+    # Linux
+    "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",  # last-resort: latin only
+]
+
+_LATIN_FONT_CANDIDATES = [
+    "/System/Library/Fonts/Helvetica.ttc",
+    "/System/Library/Fonts/SFNSDisplay.ttf",
+    "/Library/Fonts/Arial.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "C:\\Windows\\Fonts\\arialbd.ttf",
+]
+
+
+def _load_cjk_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    """Load a CJK-capable font.  Tries OS-specific CJK fonts first."""
+    for c in _CJK_FONT_CANDIDATES:
+        if os.path.exists(c):
+            try:
+                return ImageFont.truetype(c, size)
+            except OSError:
+                continue
+    return ImageFont.load_default()
+
+
+def _load_latin_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    candidates = _LATIN_FONT_CANDIDATES + _CJK_FONT_CANDIDATES
     for c in candidates:
         if os.path.exists(c):
             try:
@@ -34,6 +69,11 @@ def _load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
             except OSError:
                 continue
     return ImageFont.load_default()
+
+
+def _load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    """Default: try CJK font (covers both Latin + Chinese)."""
+    return _load_cjk_font(size, bold)
 
 
 # Position colour badge

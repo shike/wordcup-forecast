@@ -82,11 +82,70 @@ def _bg(slide, color: RGBColor = BG_DEEP) -> None:
     fill.fore_color.rgb = color
 
 
+def _set_run_fonts(run, latin: str, ea: str) -> None:
+    """Set both Latin and East-Asian typefaces on a text run.
+
+    This is the key fix for Chinese rendering: PowerPoint uses the Latin
+    typeface for Latin characters and the East-Asian typeface for CJK chars.
+    Without setting the EA typeface explicitly, the Latin font is used for
+    everything and Chinese characters become boxes (□) on systems where
+    the chosen Latin font lacks CJK glyphs.
+    """
+    rPr = run._r.get_or_add_rPr()
+    # Latin
+    latin_el = rPr.find("{http://schemas.openxmlformats.org/drawingml/2006/main}latin")
+    if latin_el is None:
+        from lxml import etree
+        latin_el = etree.SubElement(
+            rPr,
+            "{http://schemas.openxmlformats.org/drawingml/2006/main}latin",
+        )
+    latin_el.set("typeface", latin)
+    # East Asian
+    ea_el = rPr.find("{http://schemas.openxmlformats.org/drawingml/2006/main}ea")
+    if ea_el is None:
+        from lxml import etree
+        ea_el = etree.SubElement(
+            rPr,
+            "{http://schemas.openxmlformats.org/drawingml/2006/main}ea",
+        )
+    ea_el.set("typeface", ea)
+    # Complex script (Arabic/Hebrew etc., use Latin fallback)
+    cs_el = rPr.find("{http://schemas.openxmlformats.org/drawingml/2006/main}cs")
+    if cs_el is None:
+        from lxml import etree
+        cs_el = etree.SubElement(
+            rPr,
+            "{http://schemas.openxmlformats.org/drawingml/2006/main}cs",
+        )
+    cs_el.set("typeface", latin)
+
+
+def _enable_autofit(text_frame) -> None:
+    """Enable PowerPoint 'shrink text on overflow' for a text frame."""
+    from lxml import etree
+    bodyPr = text_frame._txBody.find(
+        "{http://schemas.openxmlformats.org/drawingml/2006/main}bodyPr"
+    )
+    if bodyPr is not None:
+        # remove any existing autofit
+        for child in bodyPr:
+            tag = etree.QName(child).localname
+            if tag in ("normAutofit", "spAutoFit", "noAutofit"):
+                bodyPr.remove(child)
+        af = etree.SubElement(
+            bodyPr,
+            "{http://schemas.openxmlformats.org/drawingml/2006/main}normAutofit",
+        )
+        af.set("fontScale", "92500")  # 92.5% if overflow
+
+
 def _add_textbox(
     slide, left, top, width, height, text, *,
     font_size=Pt(14), bold=False, color=WHITE,
     font_name=FONT_BODY, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
     cn: str | None = None,
+    auto_shrink: bool = True,
 ) -> None:
     if cn and text:
         text = f"{cn}\n{text}"
@@ -108,23 +167,27 @@ def _add_textbox(
         run.text = zh
         run.font.size = font_size
         run.font.bold = bold
-        run.font.name = FONT_CN_BODY
         run.font.color.rgb = color
+        _set_run_fonts(run, latin=font_name, ea=FONT_CN_BODY)
         p2 = tf.add_paragraph()
         p2.alignment = align
         run2 = p2.add_run()
         run2.text = en
         run2.font.size = Pt(int(font_size.pt * 0.65))
         run2.font.bold = False
-        run2.font.name = font_name
         run2.font.color.rgb = GREY
+        _set_run_fonts(run2, latin=font_name, ea=FONT_CN_BODY)
     else:
         run = p.add_run()
         run.text = text
         run.font.size = font_size
         run.font.bold = bold
-        run.font.name = FONT_CN_BODY if cn else font_name
         run.font.color.rgb = color
+        # Always use Microsoft YaHei for East-Asian glyphs so any stray
+        # CJK character renders correctly even on text we consider "English".
+        _set_run_fonts(run, latin=font_name, ea=FONT_CN_BODY)
+    if auto_shrink:
+        _enable_autofit(tf)
 
 
 def _add_panel(slide, left, top, width, height, fill: RGBColor = BG_PANEL) -> None:
@@ -185,9 +248,17 @@ def _page_cover(prs, result: PredictionResult) -> None:
         f"{team_a.name_en}  vs  {team_b.name_en}",
         font_size=Pt(22), bold=False, color=GREY, font_name=FONT_TITLE,
     )
+    stage_zh = {
+        "group": "小组赛",
+        "round_of_16": "八分之一决赛",
+        "quarterfinal": "四分之一决赛",
+        "semifinal": "半决赛",
+        "final": "决赛",
+        "third_place": "三四名决赛",
+    }.get(result.match.stage, result.match.stage)
     _add_textbox(
         slide, MARGIN, Inches(3.5), Inches(12), Inches(0.5),
-        f"{result.match.match_date}  ·  {tr_zh('stage')}：{tr_zh('match')}  ·  {tr_zh('venue')}：{result.match.venue}",
+        f"{result.match.match_date}  ·  阶段：{stage_zh}  ·  比赛场地：{result.match.venue}",
         font_size=Pt(16), color=WHITE, font_name=FONT_CN_BODY,
     )
 
@@ -566,18 +637,30 @@ def _page_squad_depth(prs, result: PredictionResult) -> None:
     )
     slide.shapes.add_picture(str(path), MARGIN, Inches(1.5), width=Inches(7.5))
 
-    # Bench details
-    y = Inches(5.5)
+    # Bench details — 2 columns × 3 rows to handle Chinese names without overflow
+    y = Inches(5.4)
     _add_textbox(slide, MARGIN, y, Inches(6), Inches(0.3),
                 f"{result.match.team_a.name_zh} 替补席  ·  Bench", font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY)
-    bench_text_a = "  ·  ".join(f"#{p.number or '?'} {p.name} ({p.position})" for p in result.lineup_a.bench[:5])
-    _add_textbox(slide, MARGIN, y + Inches(0.3), Inches(6), Inches(1.0),
-                bench_text_a, font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
+    bench_a = [f"#{p.number or '?'} {p.display_name_cn()} ({p.position})" for p in result.lineup_a.bench[:6]]
+    # 2 columns × 3 rows
+    for i, txt in enumerate(bench_a):
+        col = i % 2
+        row = i // 2
+        bx = MARGIN + col * Inches(3.0)
+        by = y + Inches(0.35) + row * Inches(0.32)
+        _add_textbox(slide, bx, by, Inches(3.0), Inches(0.3),
+                    "• " + txt, font_size=Pt(9), color=WHITE, font_name=FONT_CN_BODY)
+
     _add_textbox(slide, MARGIN + Inches(6.5), y, Inches(6), Inches(0.3),
                 f"{result.match.team_b.name_zh} 替补席  ·  Bench", font_size=Pt(13), bold=True, color=CYAN, font_name=FONT_CN_BODY)
-    bench_text_b = "  ·  ".join(f"#{p.number or '?'} {p.name} ({p.position})" for p in result.lineup_b.bench[:5])
-    _add_textbox(slide, MARGIN + Inches(6.5), y + Inches(0.3), Inches(6), Inches(1.0),
-                bench_text_b, font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
+    bench_b = [f"#{p.number or '?'} {p.display_name_cn()} ({p.position})" for p in result.lineup_b.bench[:6]]
+    for i, txt in enumerate(bench_b):
+        col = i % 2
+        row = i // 2
+        bx = MARGIN + Inches(6.5) + col * Inches(3.0)
+        by = y + Inches(0.35) + row * Inches(0.32)
+        _add_textbox(slide, bx, by, Inches(3.0), Inches(0.3),
+                    "• " + txt, font_size=Pt(9), color=WHITE, font_name=FONT_CN_BODY)
 
 
 def _page_radar(prs, result: PredictionResult) -> None:

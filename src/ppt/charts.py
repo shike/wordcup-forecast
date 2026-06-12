@@ -5,12 +5,14 @@ Each function returns a BytesIO that python-pptx can embed.
 from __future__ import annotations
 
 import io
+import os
 from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import font_manager
 
 from src.utils.models import (
     ModelProbabilities,
@@ -29,6 +31,42 @@ CYAN = "#00D4FF"
 GREEN = "#6EE08E"
 RED = "#FF4D6D"
 GREY = "#9AB0C8"
+
+
+# Configure matplotlib to use a CJK-capable font for chart text.
+def _setup_cjk_font() -> str:
+    """Register a CJK font with matplotlib. Returns the font name to use."""
+    candidates = [
+        # macOS
+        "/System/Library/Fonts/PingFang.ttc",
+        "/System/Library/Fonts/STHeiti Medium.ttc",
+        "/System/Library/Fonts/Hiragino Sans GB.ttc",
+        # Windows
+        "C:\\Windows\\Fonts\\msyh.ttc",
+        "C:\\Windows\\Fonts\\msyh.ttf",
+        "C:\\Windows\\Fonts\\simhei.ttf",
+        # Linux
+        "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            try:
+                font_manager.fontManager.addfont(p)
+                # Get the actual family name as registered
+                fp = font_manager.FontProperties(fname=p)
+                name = fp.get_name()
+                plt.rcParams["font.sans-serif"] = [name, "DejaVu Sans"]
+                plt.rcParams["axes.unicode_minus"] = False
+                return name
+            except Exception:
+                continue
+    plt.rcParams["font.sans-serif"] = ["DejaVu Sans"]
+    return "DejaVu Sans"
+
+
+_CJK_FONT_NAME = _setup_cjk_font()
 
 
 def _setup_axis(ax) -> None:

@@ -30,9 +30,14 @@ FONT_TITLE = "Inter"
 FONT_BODY = "Inter"
 FONT_MONO = "JetBrains Mono"
 
-# --- chinese font candidates (PowerPoint will fall back if missing) ---
-FONT_CN_TITLE = "Source Han Sans CN"
-FONT_CN_BODY = "Source Han Sans CN"
+# --- Chinese / East-Asian fonts ---
+# We set BOTH a Latin and an East-Asian font on every text run so that
+# PowerPoint picks the correct glyph for Chinese characters regardless of
+# whether the fancy Latin font is installed.  YaHei is the most universal
+# CJK font on Windows + Mac + WPS + LibreOffice; Microsoft fallback kicks
+# in for any system where it's missing.
+FONT_CN_TITLE = "Microsoft YaHei"
+FONT_CN_BODY = "Microsoft YaHei"
 
 
 # --- typography ---

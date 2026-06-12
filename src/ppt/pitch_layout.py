@@ -1,6 +1,7 @@
 """Football pitch formation image generation."""
 from __future__ import annotations
 
+import os
 from io import BytesIO
 from pathlib import Path
 
@@ -8,18 +9,48 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import font_manager
 from PIL import Image, ImageDraw, ImageFont
 
 from src.lineup.formations import get_formation
 from src.utils.models import Lineup
 
 
+# Register a CJK font with matplotlib for Chinese player names
+_CJK_FONTS = [
+    "/System/Library/Fonts/PingFang.ttc",
+    "/System/Library/Fonts/STHeiti Medium.ttc",
+    "/System/Library/Fonts/Hiragino Sans GB.ttc",
+    "C:\\Windows\\Fonts\\msyh.ttc",
+    "C:\\Windows\\Fonts\\msyh.ttf",
+    "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+]
+for _p in _CJK_FONTS:
+    if os.path.exists(_p):
+        try:
+            font_manager.fontManager.addfont(_p)
+            plt.rcParams["font.sans-serif"] = [font_manager.FontProperties(fname=_p).get_name(), "DejaVu Sans"]
+            plt.rcParams["axes.unicode_minus"] = False
+            break
+        except Exception:
+            pass
+
+
 def _load_font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    import os
+    """Load a CJK-capable font (covers Latin + Chinese)."""
     candidates = [
-        "/System/Library/Fonts/Helvetica.ttc",
-        "/System/Library/Fonts/SFNSDisplay.ttf",
-        "/Library/Fonts/Arial.ttf",
+        "/System/Library/Fonts/PingFang.ttc",
+        "/System/Library/Fonts/STHeiti Medium.ttc",
+        "/System/Library/Fonts/STHeiti Light.ttc",
+        "/Library/Fonts/Arial Unicode.ttf",
+        "C:\\Windows\\Fonts\\msyh.ttc",
+        "C:\\Windows\\Fonts\\msyh.ttf",
+        "C:\\Windows\\Fonts\\simhei.ttf",
+        "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     ]
     for c in candidates:
