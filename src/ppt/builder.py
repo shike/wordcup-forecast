@@ -862,13 +862,13 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
         _add_textbox(slide, x + Inches(1.75), y + Inches(0.1), Inches(4.1), Inches(0.3),
                     mu.title_zh, font_size=Pt(12), bold=True, color=WHITE, font_name=FONT_CN_BODY,
                     anchor=MSO_ANCHOR.MIDDLE)
-        _add_textbox(slide, x + Inches(0.25), y + Inches(0.45), Inches(5.5), Inches(0.3),
+        _add_textbox(slide, x + Inches(0.25), y + Inches(0.45), Inches(5.5), Inches(0.25),
                     f"{mu.title_en}  ·  {tag_en}", font_size=Pt(9), color=GREY, font_name=FONT_BODY)
 
         # Two player photos side by side
         for j, p in enumerate([mu.player_a, mu.player_b]):
             px = x + Inches(0.25) + j * Inches(1.55)
-            py = y + Inches(0.85)
+            py = y + Inches(0.95)
             card_path = render_player_card(p, size=(200, 280), kit_color="#FFB627")
             slide.shapes.add_picture(str(card_path), px, py, width=Inches(1.5), height=Inches(1.5))
             _add_textbox(slide, px, py + Inches(1.5), Inches(1.5), Inches(0.25),
@@ -877,13 +877,13 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
                         p.position, font_size=Pt(7), color=GREY, align=PP_ALIGN.CENTER, font_name=FONT_CN_BODY)
 
         # VS divider
-        _add_textbox(slide, x + Inches(2.7), y + Inches(1.4), Inches(0.4), Inches(0.4),
+        _add_textbox(slide, x + Inches(2.7), y + Inches(1.5), Inches(0.4), Inches(0.4),
                     "VS", font_size=Pt(18), bold=True, color=color, align=PP_ALIGN.CENTER, font_name=FONT_TITLE)
 
         # Stats — column header
         sx = x + Inches(3.2)
-        sy = y + Inches(0.85)
-        _add_textbox(slide, sx, sy - Inches(0.32), Inches(2.6), Inches(0.25),
+        sy = y + Inches(0.95)
+        _add_textbox(slide, sx, sy - Inches(0.30), Inches(2.6), Inches(0.22),
                     f"{mu.player_a.display_name_cn()}  vs  {mu.player_b.display_name_cn()}",
                     font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
         for k, (zh, en, va, vb) in enumerate(mu.stat_pairs):
@@ -1028,7 +1028,7 @@ def _page_model_output(prs, result: PredictionResult) -> None:
     probability_bars(result.model_probs, path)
     slide.shapes.add_picture(str(path), MARGIN, Inches(1.5), width=Inches(8.5))
 
-    # Right: numeric table
+    # Right: numeric table — 4 cards, each 0.95 tall (was 0.75, too cramped)
     y = Inches(1.6)
     p = result.model_probs
     for i, (label_zh, label_en, vals, color) in enumerate([
@@ -1037,14 +1037,14 @@ def _page_model_output(prs, result: PredictionResult) -> None:
         ("XGBoost 模型", "XGBoost Model", p.ml, GREEN),
         ("综合概率", "Consensus", p.consensus, RED),
     ]):
-        ry = y + Inches(i * 0.85)
-        _add_panel(slide, MARGIN + Inches(9.0), ry, Inches(3.1), Inches(0.75), fill=BG_CARD)
-        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.05), Inches(2.9), Inches(0.32),
+        ry = y + Inches(i * 0.95)
+        _add_panel(slide, MARGIN + Inches(9.0), ry, Inches(3.1), Inches(0.85), fill=BG_CARD)
+        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.05), Inches(2.9), Inches(0.28),
                     f"{label_zh}  ·  {label_en}", font_size=Pt(12), color=color, bold=True, font_name=FONT_CN_BODY)
-        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.35), Inches(2.9), Inches(0.4),
+        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.35), Inches(2.9), Inches(0.30),
                     f"{vals[0]:.0%}  /  {vals[1]:.0%}  /  {vals[2]:.0%}",
-                    font_size=Pt(15), color=WHITE, bold=True, font_name=FONT_MONO)
-        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.55), Inches(2.9), Inches(0.2),
+                    font_size=Pt(14), color=WHITE, bold=True, font_name=FONT_MONO)
+        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.65), Inches(2.9), Inches(0.18),
                     "胜 / 平 / 负  ·  Win / Draw / Loss", font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY)
 
     _add_textbox(slide, MARGIN, Inches(6.6), Inches(8), Inches(0.4),
@@ -1100,21 +1100,21 @@ def _page_sensitivity(prs, result: PredictionResult) -> None:
     factors.sort(key=lambda x: -x[1])
     path = CHART_DIR / "sensitivity.png"
     sensitivity_tornado(factors, path)
-    slide.shapes.add_picture(str(path), MARGIN, Inches(1.8), width=Inches(8.5))
+    slide.shapes.add_picture(str(path), MARGIN, Inches(1.8), width=Inches(8.0))
 
-    # #15 explicit impact-level color tags next to each factor
+    # #15 explicit impact-level color tags next to each factor (kept within page bounds)
     impact_zh = {0.95: "极高", 0.75: "高", 0.55: "中高", 0.45: "中", 0.35: "中低", 0.25: "低"}
     impact_color = {0.95: RED, 0.75: RED, 0.55: GOLD, 0.45: GOLD, 0.35: CYAN, 0.25: CYAN}
     y = Inches(1.9)
     for i, (name, swing, weight) in enumerate(factors):
         ry = y + Inches(i * 0.65)
-        _add_panel(slide, MARGIN + Inches(9.3), ry, Inches(1.1), Inches(0.45), fill=impact_color[weight])
-        _add_textbox(slide, MARGIN + Inches(9.3), ry, Inches(1.1), Inches(0.45),
+        _add_panel(slide, MARGIN + Inches(8.7), ry, Inches(1.0), Inches(0.45), fill=impact_color[weight])
+        _add_textbox(slide, MARGIN + Inches(8.7), ry, Inches(1.0), Inches(0.45),
                     impact_zh[weight], font_size=Pt(12), bold=True, color=BG_DEEP,
                     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, font_name=FONT_CN_BODY)
-        _add_textbox(slide, MARGIN + Inches(10.5), ry + Inches(0.05), Inches(2.5), Inches(0.4),
+        _add_textbox(slide, MARGIN + Inches(9.8), ry + Inches(0.05), Inches(2.6), Inches(0.4),
                     name, font_size=Pt(12), color=WHITE, font_name=FONT_CN_BODY, bold=True)
-        _add_textbox(slide, MARGIN + Inches(10.5), ry + Inches(0.30), Inches(2.5), Inches(0.3),
+        _add_textbox(slide, MARGIN + Inches(9.8), ry + Inches(0.30), Inches(2.6), Inches(0.3),
                     f"影响 ±{swing*100:.1f} pp", font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY)
 
 
