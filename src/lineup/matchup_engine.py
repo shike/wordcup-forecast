@@ -35,7 +35,6 @@ def _pair(label_zh: str, label_en: str, a: Player, b: Player) -> Matchup:
             ("国家队出场", "Caps", f"{a.caps}", f"{b.caps}"),
             ("进球", "Goals", f"{a.goals}", f"{b.goals}"),
             ("惯用脚", "Foot", a.preferred_foot, b.preferred_foot),
-            ("俱乐部", "Club", a.club or "—", b.club or "—"),
         ],
     )
 

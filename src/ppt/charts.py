@@ -43,21 +43,21 @@ def probability_bars(probs: ModelProbabilities, save_path: Path) -> Path:
     """Three-model probability bar chart for team A."""
     fig, ax = plt.subplots(figsize=(8, 4.5), facecolor=BG)
     _setup_axis(ax)
-    models = ["ELO", "Poisson", "XGBoost", "Consensus"]
+    models = ["ELO\nELO 模型", "Poisson\nPoisson 模型", "XGBoost\nXGBoost 模型", "Consensus\n综合概率"]
     win = [probs.elo[0], probs.poisson[0], probs.ml[0], probs.consensus[0]]
     draw = [probs.elo[1], probs.poisson[1], probs.ml[1], probs.consensus[1]]
     loss = [probs.elo[2], probs.poisson[2], probs.ml[2], probs.consensus[2]]
 
     x = np.arange(len(models))
     w = 0.25
-    ax.bar(x - w, win, w, color=GREEN, label="Win")
-    ax.bar(x, draw, w, color=GREY, label="Draw")
-    ax.bar(x + w, loss, w, color=RED, label="Loss")
+    ax.bar(x - w, win, w, color=GREEN, label="胜 Win")
+    ax.bar(x, draw, w, color=GREY, label="平 Draw")
+    ax.bar(x + w, loss, w, color=RED, label="负 Loss")
     ax.set_xticks(x)
-    ax.set_xticklabels(models, color=TEXT, fontsize=11)
+    ax.set_xticklabels(models, color=TEXT, fontsize=10)
     ax.set_ylim(0, 1)
-    ax.set_ylabel("Probability", color=GREY)
-    ax.set_title("Model Output Comparison", color=TEXT, fontsize=14, weight="bold", pad=12)
+    ax.set_ylabel("概率 Probability", color=GREY)
+    ax.set_title("三模型概率对比 Model Probability Comparison", color=TEXT, fontsize=14, weight="bold", pad=12)
     ax.legend(loc="upper right", facecolor=PANEL, edgecolor="#2A3F60", labelcolor=TEXT)
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
@@ -77,8 +77,8 @@ def score_distribution(mc: MonteCarloResult, save_path: Path) -> Path:
     for bar, val in zip(bars, values[::-1]):
         ax.text(val + 0.3, bar.get_y() + bar.get_height() / 2, f"{val:.1f}%",
                 va="center", color=TEXT, fontsize=9)
-    ax.set_xlabel("Probability (%)", color=GREY)
-    ax.set_title("Most Likely Scores (Monte Carlo)", color=TEXT, fontsize=14, weight="bold", pad=12)
+    ax.set_xlabel("概率（%）Probability (%)", color=GREY)
+    ax.set_title("最可能比分（蒙特卡洛模拟）Most Likely Scores (Monte Carlo)", color=TEXT, fontsize=14, weight="bold", pad=12)
     ax.set_xlim(0, max(values) * 1.18)
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
@@ -125,7 +125,7 @@ def radar_chart(stats_a: TeamStats, stats_b: TeamStats, save_path: Path, lang: s
     ax.spines["polar"].set_color("#2A3F60")
     ax.grid(color="#2A3F60", alpha=0.5)
     ax.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1), facecolor=PANEL, edgecolor="#2A3F60", labelcolor=TEXT)
-    ax.set_title("Team Comparison", color=TEXT, fontsize=13, weight="bold", pad=18)
+    ax.set_title("球队能力对比 Team Comparison", color=TEXT, fontsize=13, weight="bold", pad=18)
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
     plt.close(fig)
@@ -163,7 +163,7 @@ def qualitative_radar(
     ax.spines["polar"].set_color("#2A3F60")
     ax.grid(color="#2A3F60", alpha=0.5)
     ax.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1), facecolor=PANEL, edgecolor="#2A3F60", labelcolor=TEXT)
-    ax.set_title("Qualitative Factors", color=TEXT, fontsize=13, weight="bold", pad=18)
+    ax.set_title("定性因子 Qualitative Factors", color=TEXT, fontsize=13, weight="bold", pad=18)
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
     plt.close(fig)
@@ -182,9 +182,9 @@ def form_trend(
     ax.fill_between(range(1, len(cum) + 1), cum, color=GOLD, alpha=0.15)
     ax.set_xlim(0.5, 10.5)
     ax.set_ylim(0, max(cum) + 3)
-    ax.set_xlabel("Match #", color=GREY)
-    ax.set_ylabel("Cumulative Points", color=GREY)
-    ax.set_title(f"Recent Form · {label}", color=TEXT, fontsize=13, weight="bold", pad=10)
+    ax.set_xlabel("比赛场次 Match #", color=GREY)
+    ax.set_ylabel("累计积分 Cumulative Points", color=GREY)
+    ax.set_title(f"近期状态 · Recent Form · {label}", color=TEXT, fontsize=13, weight="bold", pad=10)
     fig.tight_layout()
     return fig
 
@@ -194,17 +194,17 @@ def depth_bars(
 ) -> Path:
     fig, ax = plt.subplots(figsize=(7, 3.5), facecolor=BG)
     _setup_axis(ax)
-    groups = ["Starter", "Bench"]
+    groups = ["首发\nStarter", "替补\nBench"]
     x = np.arange(len(groups))
     w = 0.35
-    ax.bar(x - w / 2, [a_starter, a_bench], w, color=GOLD, label="A")
-    ax.bar(x + w / 2, [b_starter, b_bench], w, color=CYAN, label="B")
+    ax.bar(x - w / 2, [a_starter, a_bench], w, color=GOLD, label="A 队")
+    ax.bar(x + w / 2, [b_starter, b_bench], w, color=CYAN, label="B 队")
     ax.set_xticks(x)
     ax.set_xticklabels(groups, color=TEXT)
     ax.set_ylim(0, 110)
-    ax.set_ylabel("Strength Index", color=GREY)
+    ax.set_ylabel("战力指数 Strength Index", color=GREY)
     ax.legend(facecolor=PANEL, edgecolor="#2A3F60", labelcolor=TEXT)
-    ax.set_title("Squad Depth", color=TEXT, fontsize=13, weight="bold", pad=10)
+    ax.set_title("阵容深度 Squad Depth", color=TEXT, fontsize=13, weight="bold", pad=10)
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
     plt.close(fig)
@@ -222,8 +222,8 @@ def sensitivity_tornado(factors: list[tuple[str, float]], save_path: Path) -> Pa
     ax.set_yticks(y)
     ax.set_yticklabels(names, color=TEXT)
     ax.invert_yaxis()
-    ax.set_xlabel("Impact on win probability (pp)", color=GREY)
-    ax.set_title("Sensitivity Analysis", color=TEXT, fontsize=13, weight="bold", pad=10)
+    ax.set_xlabel("对胜率的影响（百分点）Impact on win probability (pp)", color=GREY)
+    ax.set_title("敏感性分析 Sensitivity Analysis", color=TEXT, fontsize=13, weight="bold", pad=10)
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
     plt.close(fig)

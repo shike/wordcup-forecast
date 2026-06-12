@@ -56,7 +56,7 @@ from src.ppt.styles import (
     BODY_SIZE,
 )
 from src.utils.config import config
-from src.utils.i18n import tr, tr_pair
+from src.utils.i18n import tr, tr_pair, tr_zh, tr_en
 from src.utils.models import (
     InjuryReport,
     Lineup,
@@ -143,15 +143,15 @@ def _add_gold_line(slide, left, top, width, height=Pt(3)) -> None:
 
 
 def _page_header(slide, title_zh: str, title_en: str, page_num: int) -> None:
-    """Standard header for content pages."""
+    """Standard header for content pages. Chinese primary, English subtitle."""
     _add_gold_line(slide, MARGIN, Inches(0.45), Inches(0.4), Pt(3))
     _add_textbox(
-        slide, MARGIN + Inches(0.55), Inches(0.25), Inches(8), Inches(0.5),
-        title_en, font_size=SECTION_SIZE, bold=True, color=WHITE, font_name=FONT_TITLE
+        slide, MARGIN + Inches(0.55), Inches(0.25), Inches(10), Inches(0.5),
+        title_zh, font_size=SECTION_SIZE, bold=True, color=WHITE, font_name=FONT_CN_BODY
     )
     _add_textbox(
-        slide, MARGIN + Inches(0.55), Inches(0.7), Inches(8), Inches(0.4),
-        title_zh, font_size=Pt(13), bold=False, color=GOLD, font_name=FONT_CN_BODY
+        slide, MARGIN + Inches(0.55), Inches(0.72), Inches(10), Inches(0.32),
+        title_en, font_size=Pt(11), bold=False, color=GOLD, font_name=FONT_BODY
     )
     _add_textbox(
         slide, SLIDE_W - Inches(2), Inches(0.35), Inches(1.4), Inches(0.4),
@@ -172,95 +172,95 @@ def _page_cover(prs, result: PredictionResult) -> None:
 
     _add_textbox(
         slide, MARGIN, Inches(0.6), Inches(12), Inches(0.5),
-        "WORD CUP FORECAST  ·  世界杯预测",
-        font_size=Pt(12), bold=True, color=GOLD, font_name=FONT_MONO,
+        "世界杯预测报告  ·  WORLD CUP FORECAST",
+        font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY,
     )
     _add_textbox(
         slide, MARGIN, Inches(1.6), Inches(12), Inches(1.2),
-        f"{team_a.name_en}  vs  {team_b.name_en}",
-        font_size=Pt(54), bold=True, color=WHITE, font_name=FONT_TITLE,
-    )
-    _add_textbox(
-        slide, MARGIN, Inches(2.7), Inches(12), Inches(0.6),
         f"{team_a.name_zh}  对阵  {team_b.name_zh}",
-        font_size=Pt(28), bold=False, color=GREY, font_name=FONT_CN_BODY,
+        font_size=Pt(50), bold=True, color=WHITE, font_name=FONT_CN_BODY,
     )
     _add_textbox(
-        slide, MARGIN, Inches(3.6), Inches(12), Inches(0.5),
-        f"{result.match.match_date}    ·    {result.match.stage.upper().replace('_', ' ')}    ·    {result.match.venue}",
-        font_size=Pt(16), color=WHITE, font_name=FONT_MONO,
+        slide, MARGIN, Inches(2.7), Inches(12), Inches(0.5),
+        f"{team_a.name_en}  vs  {team_b.name_en}",
+        font_size=Pt(22), bold=False, color=GREY, font_name=FONT_TITLE,
+    )
+    _add_textbox(
+        slide, MARGIN, Inches(3.5), Inches(12), Inches(0.5),
+        f"{result.match.match_date}  ·  {tr_zh('stage')}：{tr_zh('match')}  ·  {tr_zh('venue')}：{result.match.venue}",
+        font_size=Pt(16), color=WHITE, font_name=FONT_CN_BODY,
     )
 
     # Recommended pick
     pick = result.recommended_pick
-    pick_team = team_a if pick == "A" else (team_b if pick == "B" else None)
     pick_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
     pick_en = team_a.name_en if pick == "A" else (team_b.name_en if pick == "B" else "Draw")
-    _add_panel(slide, MARGIN, Inches(4.7), Inches(6.2), Inches(2.0), fill=BG_PANEL)
+    _add_panel(slide, MARGIN, Inches(4.6), Inches(6.2), Inches(2.1), fill=BG_PANEL)
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(4.85), Inches(6), Inches(0.4),
-        "RECOMMENDED PICK  ·  推荐结果", font_size=Pt(10), color=GOLD, font_name=FONT_MONO, bold=True,
+        slide, MARGIN + Inches(0.3), Inches(4.75), Inches(6), Inches(0.4),
+        "推荐结果  ·  RECOMMENDED PICK", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True,
     )
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(5.2), Inches(6), Inches(0.8),
-        f"{pick_en}", font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_TITLE,
+        slide, MARGIN + Inches(0.3), Inches(5.1), Inches(6), Inches(0.8),
+        pick_zh, font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_CN_BODY,
     )
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(5.95), Inches(6), Inches(0.5),
-        pick_zh, font_size=Pt(20), color=GOLD, font_name=FONT_CN_BODY,
+        slide, MARGIN + Inches(0.3), Inches(5.85), Inches(6), Inches(0.4),
+        pick_en, font_size=Pt(16), color=GOLD, font_name=FONT_TITLE,
     )
     conf = result.confidence
     conf_color = GREEN if conf == "high" else (GOLD if conf == "medium" else RED)
+    conf_zh = "高" if conf == "high" else "中" if conf == "medium" else "低"
     _add_textbox(
-        slide, MARGIN + Inches(0.3), Inches(6.35), Inches(6), Inches(0.4),
-        f"Confidence: {conf.upper()}  ·  信心：{'高' if conf == 'high' else '中' if conf == 'medium' else '低'}",
-        font_size=Pt(12), color=conf_color, font_name=FONT_MONO, bold=True,
+        slide, MARGIN + Inches(0.3), Inches(6.25), Inches(6), Inches(0.4),
+        f"信心指数：{conf_zh}（{conf.upper()}）",
+        font_size=Pt(13), color=conf_color, font_name=FONT_CN_BODY, bold=True,
     )
 
     # Right side: probability numbers
     p = result.model_probs.consensus
     right_left = MARGIN + Inches(6.6)
-    _add_panel(slide, right_left, Inches(4.7), Inches(5.5), Inches(2.0), fill=BG_PANEL)
+    _add_panel(slide, right_left, Inches(4.6), Inches(5.5), Inches(2.1), fill=BG_PANEL)
     _add_textbox(
-        slide, right_left + Inches(0.3), Inches(4.85), Inches(5), Inches(0.4),
-        "CONSENSUS  ·  综合概率", font_size=Pt(10), color=GOLD, font_name=FONT_MONO, bold=True,
+        slide, right_left + Inches(0.3), Inches(4.75), Inches(5), Inches(0.4),
+        "综合概率  ·  CONSENSUS", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True,
     )
     _add_textbox(
-        slide, right_left + Inches(0.3), Inches(5.3), Inches(1.5), Inches(1.2),
+        slide, right_left + Inches(0.3), Inches(5.2), Inches(1.5), Inches(1.2),
         f"{p[0]:.0%}", font_size=Pt(40), bold=True, color=GREEN, font_name=FONT_MONO, align=PP_ALIGN.CENTER,
     )
     _add_textbox(
-        slide, right_left + Inches(0.3), Inches(6.5), Inches(1.5), Inches(0.3),
-        team_a.name_en, font_size=Pt(10), color=GREY, align=PP_ALIGN.CENTER,
+        slide, right_left + Inches(0.3), Inches(6.4), Inches(1.5), Inches(0.3),
+        f"胜 · {team_a.name_zh}", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER,
     )
     _add_textbox(
-        slide, right_left + Inches(1.95), Inches(5.3), Inches(1.5), Inches(1.2),
+        slide, right_left + Inches(1.95), Inches(5.2), Inches(1.5), Inches(1.2),
         f"{p[1]:.0%}", font_size=Pt(40), bold=True, color=GREY, font_name=FONT_MONO, align=PP_ALIGN.CENTER,
     )
     _add_textbox(
-        slide, right_left + Inches(1.95), Inches(6.5), Inches(1.5), Inches(0.3),
-        "DRAW", font_size=Pt(10), color=GREY, align=PP_ALIGN.CENTER,
+        slide, right_left + Inches(1.95), Inches(6.4), Inches(1.5), Inches(0.3),
+        "平 · DRAW", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER,
     )
     _add_textbox(
-        slide, right_left + Inches(3.6), Inches(5.3), Inches(1.5), Inches(1.2),
+        slide, right_left + Inches(3.6), Inches(5.2), Inches(1.5), Inches(1.2),
         f"{p[2]:.0%}", font_size=Pt(40), bold=True, color=RED, font_name=FONT_MONO, align=PP_ALIGN.CENTER,
     )
     _add_textbox(
-        slide, right_left + Inches(3.6), Inches(6.5), Inches(1.5), Inches(0.3),
-        team_b.name_en, font_size=Pt(10), color=GREY, align=PP_ALIGN.CENTER,
+        slide, right_left + Inches(3.6), Inches(6.4), Inches(1.5), Inches(0.3),
+        f"负 · {team_b.name_zh}", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER,
     )
 
     _add_textbox(
         slide, MARGIN, Inches(7.05), Inches(12), Inches(0.3),
-        f"Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}  ·  Model v1.0  ·  Data: Wikipedia + football-data.org",
-        font_size=Pt(9), color=GREY_DARK, font_name=FONT_MONO,
+        f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}  ·  模型版本 v1.0  ·  数据：Wikipedia + football-data.org",
+        font_size=Pt(9), color=GREY_DARK, font_name=FONT_CN_BODY,
     )
 
 
 def _page_summary(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Executive Summary", "执行摘要", 2)
+    _page_header(slide, "执行摘要", "Executive Summary", 2)
     p = result.model_probs.consensus
     team_a = result.match.team_a
     team_b = result.match.team_b
@@ -269,49 +269,46 @@ def _page_summary(prs, result: PredictionResult) -> None:
     y = Inches(1.4)
     card_w = Inches(4.0)
     card_h = Inches(2.2)
-    for i, (label_zh, label_en, val, color) in enumerate([
-        ("胜 · Win", team_a.name_en, p[0], GREEN),
-        ("平 · Draw", "Draw", p[1], GREY),
-        ("负 · Loss", team_b.name_en, p[2], RED),
+    for i, (label_zh, val, color, team_zh) in enumerate([
+        (f"{team_a.name_zh} 胜", p[0], GREEN, team_a.name_zh),
+        ("平局", p[1], GREY, "—"),
+        (f"{team_b.name_zh} 胜", p[2], RED, team_b.name_zh),
     ]):
         x = MARGIN + i * (card_w + Inches(0.15))
         _add_panel(slide, x, y, card_w, card_h, fill=BG_PANEL)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(0.2), card_w - Inches(0.6), Inches(0.3),
-                    label_en, font_size=Pt(11), color=color, bold=True, font_name=FONT_MONO)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(0.55), card_w - Inches(0.6), Inches(0.3),
-                    label_zh, font_size=Pt(10), color=GREY)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(0.9), card_w - Inches(0.6), Inches(1.0),
+        _add_textbox(slide, x + Inches(0.3), y + Inches(0.2), card_w - Inches(0.6), Inches(0.4),
+                    label_zh, font_size=Pt(16), color=color, bold=True, font_name=FONT_CN_BODY)
+        _add_textbox(slide, x + Inches(0.3), y + Inches(0.7), card_w - Inches(0.6), Inches(0.3),
+                    team_zh, font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
+        _add_textbox(slide, x + Inches(0.3), y + Inches(1.05), card_w - Inches(0.6), Inches(1.0),
                     f"{val:.0%}", font_size=Pt(54), bold=True, color=color, font_name=FONT_MONO)
-        _add_textbox(slide, x + Inches(0.3), y + Inches(1.85), card_w - Inches(0.6), Inches(0.3),
-                    f"{team_a.name_zh if i==0 else (team_b.name_zh if i==2 else '—')}",
-                    font_size=Pt(11), color=GREY, font_name=FONT_CN_BODY)
 
     # Recommended pick + expected goals
     y2 = Inches(3.9)
     _add_panel(slide, MARGIN, y2, Inches(6.2), Inches(1.6), fill=BG_PANEL)
     _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(0.2), Inches(6), Inches(0.3),
-                "RECOMMENDED PICK  ·  推荐结果", font_size=Pt(10), color=GOLD, font_name=FONT_MONO, bold=True)
+                "推荐结果  ·  RECOMMENDED PICK", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     pick = result.recommended_pick
     pick_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
-    pick_en = team_a.name_en if pick == "A" else (team_b.name_en if pick == "B" else "Draw")
+    conf_zh = "高" if result.confidence == "high" else "中" if result.confidence == "medium" else "低"
     _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(0.55), Inches(6), Inches(0.6),
-                f"{pick_en}  ({pick_zh})", font_size=Pt(28), bold=True, color=WHITE, font_name=FONT_TITLE)
+                pick_zh, font_size=Pt(32), bold=True, color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(0.3), y2 + Inches(1.15), Inches(6), Inches(0.4),
-                f"Confidence: {result.confidence.upper()}  ·  信心：{'高' if result.confidence == 'high' else '中' if result.confidence == 'medium' else '低'}",
-                font_size=Pt(11), color=GOLD, font_name=FONT_MONO, bold=True)
+                f"信心指数：{conf_zh}  ·  Confidence: {result.confidence.upper()}",
+                font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
 
     _add_panel(slide, MARGIN + Inches(6.5), y2, Inches(5.6), Inches(1.6), fill=BG_PANEL)
     _add_textbox(slide, MARGIN + Inches(6.8), y2 + Inches(0.2), Inches(5), Inches(0.3),
-                "EXPECTED SCORE  ·  预期比分", font_size=Pt(10), color=GOLD, font_name=FONT_MONO, bold=True)
+                "预期比分  ·  EXPECTED SCORE", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     eg = result.model_probs.expected_goals
     _add_textbox(slide, MARGIN + Inches(6.8), y2 + Inches(0.6), Inches(5), Inches(0.9),
                 f"{eg[0]:.1f}  —  {eg[1]:.1f}",
                 font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
 
-    # Top 3 likely scores
+    # Top 5 likely scores
     y3 = Inches(5.7)
     _add_textbox(slide, MARGIN, y3, Inches(12), Inches(0.4),
-                "MOST LIKELY SCORES  ·  最可能比分", font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_TITLE)
+                "最可能比分 TOP 5  ·  TOP 5 LIKELY SCORES", font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY)
     top = result.monte_carlo.top_scores[:5]
     for i, (score, prob) in enumerate(top):
         x = MARGIN + i * Inches(2.45)
@@ -325,35 +322,35 @@ def _page_summary(prs, result: PredictionResult) -> None:
 def _page_team_profile(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Team Profile", "球队档案", 3)
+    _page_header(slide, "球队档案", "Team Profile", 3)
     team_a = result.match.team_a
     team_b = result.match.team_b
 
-    headers = ["FIFA Rank", "ELO", "Coach", "Captain", "Confederation", "Kit Color"]
+    headers_zh = ["FIFA 排名", "ELO 评分", "主教练", "队长", "所属足联", "主队服颜色"]
+    headers_en = ["FIFA Rank", "ELO Rating", "Head Coach", "Captain", "Confederation", "Kit Color"]
     a_vals = [f"#{team_a.fifa_ranking}", f"{team_a.elo:.0f}", team_a.coach, team_a.captain, team_a.confederation, ""]
     b_vals = [f"#{team_b.fifa_ranking}", f"{team_b.elo:.0f}", team_b.coach, team_b.captain, team_b.confederation, ""]
 
-    y = Inches(1.6)
-    for i, (header, va, vb) in enumerate(zip(headers, a_vals, b_vals)):
-        _add_panel(slide, MARGIN, y + i * Inches(0.6), Inches(12.1), Inches(0.5), fill=BG_PANEL if i % 2 == 0 else BG_CARD)
-        _add_textbox(slide, MARGIN + Inches(0.3), y + i * Inches(0.6) + Inches(0.13), Inches(3.0), Inches(0.4),
-                    header, font_size=Pt(11), color=GOLD, font_name=FONT_MONO, bold=True)
-        _add_textbox(slide, MARGIN + Inches(3.5), y + i * Inches(0.6) + Inches(0.13), Inches(4.0), Inches(0.4),
-                    va, font_size=Pt(14), color=WHITE, font_name=FONT_TITLE, bold=True)
-        _add_textbox(slide, MARGIN + Inches(7.7), y + i * Inches(0.6) + Inches(0.13), Inches(4.0), Inches(0.4),
-                    vb, font_size=Pt(14), color=WHITE, font_name=FONT_TITLE, bold=True, align=PP_ALIGN.LEFT)
+    y = Inches(1.5)
+    for i, (h_zh, h_en, va, vb) in enumerate(zip(headers_zh, headers_en, a_vals, b_vals)):
+        _add_panel(slide, MARGIN, y + i * Inches(0.65), Inches(12.1), Inches(0.55), fill=BG_PANEL if i % 2 == 0 else BG_CARD)
+        _add_textbox(slide, MARGIN + Inches(0.3), y + i * Inches(0.65) + Inches(0.1), Inches(3.0), Inches(0.4),
+                    f"{h_zh}  ·  {h_en}", font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+        _add_textbox(slide, MARGIN + Inches(3.5), y + i * Inches(0.65) + Inches(0.1), Inches(4.0), Inches(0.4),
+                    str(va), font_size=Pt(15), color=WHITE, font_name=FONT_CN_BODY, bold=True)
+        _add_textbox(slide, MARGIN + Inches(7.7), y + i * Inches(0.65) + Inches(0.1), Inches(4.0), Inches(0.4),
+                    str(vb), font_size=Pt(15), color=WHITE, font_name=FONT_CN_BODY, bold=True, align=PP_ALIGN.LEFT)
 
 
 def _page_recent_form(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Recent Form", "近期状态", 4)
+    _page_header(slide, "近期状态", "Recent Form (Last 10 Matches)", 4)
     team_a = result.match.team_a
     team_b = result.match.team_b
 
     # Build synthetic 10-game form from stats
     def gen_form(stats: TeamStats) -> list[str]:
-        # expected: more wins for stronger teams
         strength = stats.avg_player_rating
         from random import Random
         rng = Random(int(stats.team_code.__hash__()))
@@ -361,72 +358,72 @@ def _page_recent_form(prs, result: PredictionResult) -> None:
         for _ in range(10):
             r = rng.random()
             if r < (strength - 6.5) * 0.3 + 0.4:
-                results.append("W")
+                results.append("胜")
             elif r < 0.7:
-                results.append("D")
+                results.append("平")
             else:
-                results.append("L")
+                results.append("负")
         return results
 
     form_a = gen_form(result.team_a_stats)
     form_b = gen_form(result.team_b_stats)
 
     # Render form chips
-    y = Inches(1.6)
-    _add_textbox(slide, MARGIN, y, Inches(2), Inches(0.4),
-                team_a.name_en, font_size=Pt(16), bold=True, color=WHITE, font_name=FONT_TITLE)
-    _add_textbox(slide, MARGIN, y + Inches(0.4), Inches(2), Inches(0.3),
-                team_a.name_zh, font_size=Pt(11), color=GREY, font_name=FONT_CN_BODY)
+    y = Inches(1.5)
+    _add_textbox(slide, MARGIN, y, Inches(3), Inches(0.4),
+                team_a.name_zh, font_size=Pt(20), bold=True, color=WHITE, font_name=FONT_CN_BODY)
+    _add_textbox(slide, MARGIN, y + Inches(0.42), Inches(3), Inches(0.3),
+                f"近 10 场  ·  {team_a.name_en}", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
     for i, r in enumerate(form_a):
-        color = GREEN if r == "W" else (GREY if r == "D" else RED)
-        chip_left = MARGIN + Inches(2.5) + i * Inches(0.9)
-        _add_panel(slide, chip_left, y + Inches(0.1), Inches(0.8), Inches(0.8), fill=color)
-        _add_textbox(slide, chip_left, y + Inches(0.1), Inches(0.8), Inches(0.8),
-                    r, font_size=Pt(20), bold=True, color=BG_DEEP, font_name=FONT_MONO,
+        color = GREEN if r == "胜" else (GREY if r == "平" else RED)
+        chip_left = MARGIN + Inches(3.0) + i * Inches(0.85)
+        _add_panel(slide, chip_left, y + Inches(0.1), Inches(0.75), Inches(0.75), fill=color)
+        _add_textbox(slide, chip_left, y + Inches(0.1), Inches(0.75), Inches(0.75),
+                    r, font_size=Pt(20), bold=True, color=BG_DEEP, font_name=FONT_CN_BODY,
                     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
-    y2 = Inches(3.5)
-    _add_textbox(slide, MARGIN, y2, Inches(2), Inches(0.4),
-                team_b.name_en, font_size=Pt(16), bold=True, color=WHITE, font_name=FONT_TITLE)
-    _add_textbox(slide, MARGIN, y2 + Inches(0.4), Inches(2), Inches(0.3),
-                team_b.name_zh, font_size=Pt(11), color=GREY, font_name=FONT_CN_BODY)
+    y2 = Inches(3.3)
+    _add_textbox(slide, MARGIN, y2, Inches(3), Inches(0.4),
+                team_b.name_zh, font_size=Pt(20), bold=True, color=WHITE, font_name=FONT_CN_BODY)
+    _add_textbox(slide, MARGIN, y2 + Inches(0.42), Inches(3), Inches(0.3),
+                f"近 10 场  ·  {team_b.name_en}", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
     for i, r in enumerate(form_b):
-        color = GREEN if r == "W" else (GREY if r == "D" else RED)
-        chip_left = MARGIN + Inches(2.5) + i * Inches(0.9)
-        _add_panel(slide, chip_left, y2 + Inches(0.1), Inches(0.8), Inches(0.8), fill=color)
-        _add_textbox(slide, chip_left, y2 + Inches(0.1), Inches(0.8), Inches(0.8),
-                    r, font_size=Pt(20), bold=True, color=BG_DEEP, font_name=FONT_MONO,
+        color = GREEN if r == "胜" else (GREY if r == "平" else RED)
+        chip_left = MARGIN + Inches(3.0) + i * Inches(0.85)
+        _add_panel(slide, chip_left, y2 + Inches(0.1), Inches(0.75), Inches(0.75), fill=color)
+        _add_textbox(slide, chip_left, y2 + Inches(0.1), Inches(0.75), Inches(0.75),
+                    r, font_size=Pt(20), bold=True, color=BG_DEEP, font_name=FONT_CN_BODY,
                     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
     # Stats summary
-    y3 = Inches(5.2)
-    _add_panel(slide, MARGIN, y3, Inches(6.0), Inches(1.6), fill=BG_PANEL)
+    y3 = Inches(5.0)
+    _add_panel(slide, MARGIN, y3, Inches(6.0), Inches(1.8), fill=BG_PANEL)
     _add_textbox(slide, MARGIN + Inches(0.3), y3 + Inches(0.15), Inches(5.5), Inches(0.4),
-                f"{team_a.name_en}  ·  {team_a.name_zh}", font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_TITLE)
+                f"{team_a.name_zh}  ·  {team_a.name_en}", font_size=Pt(14), bold=True, color=GOLD, font_name=FONT_CN_BODY)
     s = result.team_a_stats
     _add_textbox(slide, MARGIN + Inches(0.3), y3 + Inches(0.55), Inches(5.5), Inches(0.3),
-                f"Goals/Game: {s.goals_per_game}    Conceded: {s.conceded_per_game}    xG: {s.xg_per_game}",
-                font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+                f"场均进球：{s.goals_per_game}    场均失球：{s.conceded_per_game}    xG：{s.xg_per_game}",
+                font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(0.3), y3 + Inches(0.85), Inches(5.5), Inches(0.3),
-                f"Clean Sheet: {s.clean_sheet_rate:.0%}    Key Passes: {s.key_passes_per_game}    Rating: {s.avg_player_rating:.1f}",
-                font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+                f"零封率：{s.clean_sheet_rate:.0%}    关键传球：{s.key_passes_per_game}    球员平均评分：{s.avg_player_rating:.1f}",
+                font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(0.3), y3 + Inches(1.15), Inches(5.5), Inches(0.3),
-                f"Last 10: W{s.last_10_wins} D{s.last_10_draws} L{s.last_10_losses}",
-                font_size=Pt(11), color=GOLD, font_name=FONT_MONO, bold=True)
+                f"近 10 场：胜{s.last_10_wins} 平{s.last_10_draws} 负{s.last_10_losses}",
+                font_size=Pt(11), color=GOLD, font_name=FONT_CN_BODY, bold=True)
 
-    _add_panel(slide, MARGIN + Inches(6.3), y3, Inches(6.0), Inches(1.6), fill=BG_PANEL)
+    _add_panel(slide, MARGIN + Inches(6.3), y3, Inches(6.0), Inches(1.8), fill=BG_PANEL)
     _add_textbox(slide, MARGIN + Inches(6.6), y3 + Inches(0.15), Inches(5.5), Inches(0.4),
-                f"{team_b.name_en}  ·  {team_b.name_zh}", font_size=Pt(13), bold=True, color=CYAN, font_name=FONT_TITLE)
+                f"{team_b.name_zh}  ·  {team_b.name_en}", font_size=Pt(14), bold=True, color=CYAN, font_name=FONT_CN_BODY)
     s = result.team_b_stats
     _add_textbox(slide, MARGIN + Inches(6.6), y3 + Inches(0.55), Inches(5.5), Inches(0.3),
-                f"Goals/Game: {s.goals_per_game}    Conceded: {s.conceded_per_game}    xG: {s.xg_per_game}",
-                font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+                f"场均进球：{s.goals_per_game}    场均失球：{s.conceded_per_game}    xG：{s.xg_per_game}",
+                font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(6.6), y3 + Inches(0.85), Inches(5.5), Inches(0.3),
-                f"Clean Sheet: {s.clean_sheet_rate:.0%}    Key Passes: {s.key_passes_per_game}    Rating: {s.avg_player_rating:.1f}",
-                font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+                f"零封率：{s.clean_sheet_rate:.0%}    关键传球：{s.key_passes_per_game}    球员平均评分：{s.avg_player_rating:.1f}",
+                font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(6.6), y3 + Inches(1.15), Inches(5.5), Inches(0.3),
-                f"Last 10: W{s.last_10_wins} D{s.last_10_draws} L{s.last_10_losses}",
-                font_size=Pt(11), color=CYAN, font_name=FONT_MONO, bold=True)
+                f"近 10 场：胜{s.last_10_wins} 平{s.last_10_draws} 负{s.last_10_losses}",
+                font_size=Pt(11), color=CYAN, font_name=FONT_CN_BODY, bold=True)
 
 
 def _page_predicted_lineup(prs, result: PredictionResult, side: str = "A") -> None:
@@ -438,9 +435,9 @@ def _page_predicted_lineup(prs, result: PredictionResult, side: str = "A") -> No
     team = team_a if side == "A" else team_b
     kit = team_a.home_kit_color if side == "A" else team_b.home_kit_color
 
-    _page_header(slide, f"Predicted Lineup · {team.name_en}", f"预测首发 · {team.name_zh}", 5 if side == "A" else 6)
+    _page_header(slide, f"预测首发 · {team.name_zh}", f"Predicted Lineup · {team.name_en}", 5 if side == "A" else 6)
     _add_textbox(slide, MARGIN, Inches(1.2), Inches(12), Inches(0.4),
-                f"Formation · 阵型:  {lineup.formation}", font_size=Pt(16), bold=True, color=GOLD, font_name=FONT_MONO)
+                f"阵型：{lineup.formation}  ·  FORMATION", font_size=Pt(15), bold=True, color=GOLD, font_name=FONT_CN_BODY)
 
     # Pitch image on the left
     pitch_path = CHART_DIR / f"pitch_{team.code}.png"
@@ -463,9 +460,9 @@ def _page_predicted_lineup(prs, result: PredictionResult, side: str = "A") -> No
                     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, font_name=FONT_MONO)
         # name + pos
         _add_textbox(slide, x + Inches(0.7), y + Inches(0.05), Inches(2.0), Inches(0.4),
-                    p.name, font_size=Pt(11), bold=True, color=WHITE, font_name=FONT_TITLE)
+                    p.name, font_size=Pt(11), bold=True, color=WHITE, font_name=FONT_CN_BODY)
         _add_textbox(slide, x + Inches(0.7), y + Inches(0.4), Inches(2.0), Inches(0.3),
-                    f"{p.position}  ·  {p.club}", font_size=Pt(8), color=GREY, font_name=FONT_MONO)
+                    f"{p.position}  ·  {p.club}", font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY)
         # rating
         _add_textbox(slide, x + Inches(2.6), y + Inches(0.05), Inches(0.85), Inches(0.75),
                     f"{p.rating:.0f}", font_size=Pt(22), bold=True, color=GOLD if side == "A" else CYAN,
@@ -477,7 +474,7 @@ def _page_key_players(prs, result: PredictionResult, side: str = "A") -> None:
     _bg(slide)
     team = result.match.team_a if side == "A" else result.match.team_b
     lineup = result.lineup_a if side == "A" else result.lineup_b
-    _page_header(slide, f"Key Players · {team.name_en}", f"核心球员 · {team.name_zh}", 7 if side == "A" else 8)
+    _page_header(slide, f"核心球员 TOP 5 · {team.name_zh}", f"Key Players · {team.name_en}", 7 if side == "A" else 8)
 
     # Top 5 by rating
     key_players = sorted(lineup.players, key=lambda p: p.rating, reverse=True)[:5]
@@ -491,19 +488,19 @@ def _page_key_players(prs, result: PredictionResult, side: str = "A") -> None:
         # stat row
         _add_panel(slide, x, Inches(5.0), Inches(2.3), Inches(1.4), fill=BG_CARD)
         _add_textbox(slide, x + Inches(0.1), Inches(5.05), Inches(2.1), Inches(0.3),
-                    f"Age {p.age}  ·  Caps {p.caps}  ·  Goals {p.goals}",
-                    font_size=Pt(9), color=GREY, font_name=FONT_MONO)
+                    f"年龄 {p.age}  ·  国家队出场 {p.caps}  ·  进球 {p.goals}",
+                    font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY)
         _add_textbox(slide, x + Inches(0.1), Inches(5.4), Inches(2.1), Inches(0.4),
-                    f"Height {p.height_cm}cm  ·  Foot {p.preferred_foot}",
-                    font_size=Pt(9), color=GREY, font_name=FONT_MONO)
+                    f"身高 {p.height_cm}cm  ·  惯用脚 {p.preferred_foot}",
+                    font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY)
         _add_textbox(slide, x + Inches(0.1), Inches(5.7), Inches(2.1), Inches(0.4),
-                    p.club, font_size=Pt(10), bold=True, color=WHITE, font_name=FONT_TITLE)
+                    p.club, font_size=Pt(10), bold=True, color=WHITE, font_name=FONT_CN_BODY)
 
 
 def _page_key_matchups(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Key Matchups", "关键对位 1v1", 9)
+    _page_header(slide, "关键对位 1v1", "Key Matchups", 9)
 
     matchups = result.key_matchups
     for i, mu in enumerate(matchups):
@@ -513,51 +510,53 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
         y = Inches(1.5) + row * Inches(2.9)
 
         _add_panel(slide, x, y, Inches(6.0), Inches(2.7), fill=BG_PANEL)
-        # Title
+        # Title (Chinese primary, English subtitle)
         _add_textbox(slide, x + Inches(0.2), y + Inches(0.1), Inches(5.6), Inches(0.4),
-                    mu.title_en, font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_TITLE)
-        _add_textbox(slide, x + Inches(0.2), y + Inches(0.45), Inches(5.6), Inches(0.3),
-                    mu.title_zh, font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
+                    mu.title_zh, font_size=Pt(14), bold=True, color=GOLD, font_name=FONT_CN_BODY)
+        _add_textbox(slide, x + Inches(0.2), y + Inches(0.5), Inches(5.6), Inches(0.3),
+                    mu.title_en, font_size=Pt(9), color=GREY, font_name=FONT_BODY)
 
         # Two player photos side by side
         for j, p in enumerate([mu.player_a, mu.player_b]):
             px = x + Inches(0.2) + j * Inches(1.7)
-            py = y + Inches(0.85)
+            py = y + Inches(0.95)
             card_path = render_player_card(p, size=(200, 280), kit_color="#FFB627")
             slide.shapes.add_picture(str(card_path), px, py, width=Inches(1.6), height=Inches(1.6))
             _add_textbox(slide, px, py + Inches(1.6), Inches(1.6), Inches(0.25),
-                        p.name, font_size=Pt(9), color=WHITE, align=PP_ALIGN.CENTER, font_name=FONT_TITLE)
+                        p.name, font_size=Pt(9), color=WHITE, align=PP_ALIGN.CENTER, font_name=FONT_CN_BODY)
             _add_textbox(slide, px, py + Inches(1.78), Inches(1.6), Inches(0.2),
-                        p.position, font_size=Pt(8), color=GREY, align=PP_ALIGN.CENTER, font_name=FONT_MONO)
+                        p.position, font_size=Pt(8), color=GREY, align=PP_ALIGN.CENTER, font_name=FONT_CN_BODY)
 
         # VS divider
         _add_textbox(slide, x + Inches(3.0), y + Inches(1.5), Inches(0.4), Inches(0.4),
                     "VS", font_size=Pt(20), bold=True, color=RED, align=PP_ALIGN.CENTER, font_name=FONT_TITLE)
 
-        # Stats
+        # Stats — column header
         sx = x + Inches(3.5)
-        sy = y + Inches(0.85)
+        sy = y + Inches(0.95)
+        _add_textbox(slide, sx, sy - Inches(0.35), Inches(3.0), Inches(0.25),
+                    mu.player_a.name + "  vs  " + mu.player_b.name, font_size=Pt(8), color=GREY,
+                    font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
         for k, (zh, en, va, vb) in enumerate(mu.stat_pairs):
             row_y = sy + Inches(k * 0.27)
-            # try numeric comparison, fall back to neutral display
             try:
                 va_num = float(str(va).rstrip("cm").strip())
                 vb_num = float(str(vb).rstrip("cm").strip())
                 color = GOLD if va_num > vb_num else (CYAN if vb_num > va_num else GREY)
             except (ValueError, TypeError):
                 color = GREY
-            _add_textbox(slide, sx, row_y, Inches(1.0), Inches(0.25),
+            _add_textbox(slide, sx, row_y, Inches(0.9), Inches(0.25),
                         va, font_size=Pt(10), bold=True, color=color, font_name=FONT_MONO, align=PP_ALIGN.RIGHT)
-            _add_textbox(slide, sx + Inches(1.05), row_y, Inches(0.9), Inches(0.25),
-                        en, font_size=Pt(8), color=GREY, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
-            _add_textbox(slide, sx + Inches(2.0), row_y, Inches(1.0), Inches(0.25),
+            _add_textbox(slide, sx + Inches(0.95), row_y, Inches(1.0), Inches(0.25),
+                        zh, font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
+            _add_textbox(slide, sx + Inches(2.0), row_y, Inches(0.9), Inches(0.25),
                         vb, font_size=Pt(10), bold=True, color=color, font_name=FONT_MONO)
 
 
 def _page_squad_depth(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Squad Depth", "阵容深度", 10)
+    _page_header(slide, "阵容深度", "Squad Depth", 10)
 
     path = CHART_DIR / "depth.png"
     depth_bars(
@@ -570,21 +569,21 @@ def _page_squad_depth(prs, result: PredictionResult) -> None:
     # Bench details
     y = Inches(5.5)
     _add_textbox(slide, MARGIN, y, Inches(6), Inches(0.3),
-                f"{result.match.team_a.name_en} bench · 替补席", font_size=Pt(12), bold=True, color=GOLD, font_name=FONT_TITLE)
+                f"{result.match.team_a.name_zh} 替补席  ·  Bench", font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY)
     bench_text_a = "  ·  ".join(f"#{p.number or '?'} {p.name} ({p.position})" for p in result.lineup_a.bench[:5])
     _add_textbox(slide, MARGIN, y + Inches(0.3), Inches(6), Inches(1.0),
-                bench_text_a, font_size=Pt(10), color=WHITE, font_name=FONT_MONO)
+                bench_text_a, font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(6.5), y, Inches(6), Inches(0.3),
-                f"{result.match.team_b.name_en} bench · 替补席", font_size=Pt(12), bold=True, color=CYAN, font_name=FONT_TITLE)
+                f"{result.match.team_b.name_zh} 替补席  ·  Bench", font_size=Pt(13), bold=True, color=CYAN, font_name=FONT_CN_BODY)
     bench_text_b = "  ·  ".join(f"#{p.number or '?'} {p.name} ({p.position})" for p in result.lineup_b.bench[:5])
     _add_textbox(slide, MARGIN + Inches(6.5), y + Inches(0.3), Inches(6), Inches(1.0),
-                bench_text_b, font_size=Pt(10), color=WHITE, font_name=FONT_MONO)
+                bench_text_b, font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
 
 
 def _page_radar(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Team Capabilities", "能力对比雷达", 11)
+    _page_header(slide, "球队能力对比", "Team Capabilities", 11)
 
     path = CHART_DIR / "radar.png"
     radar_chart(result.team_a_stats, result.team_b_stats, path)
@@ -593,32 +592,20 @@ def _page_radar(prs, result: PredictionResult) -> None:
     # Side stats table
     y = Inches(1.5)
     rows = [
-        ("Goals/Game", "场均进球"),
-        ("Conceded/Game", "场均失球"),
-        ("xG", "期望进球"),
-        ("xGA", "期望失球"),
-        ("Clean Sheet %", "零封率"),
-        ("Key Passes", "关键传球"),
+        ("场均进球", "Goals/Game", "goals_per_game", "{:.2f}"),
+        ("场均失球", "Conceded/Game", "conceded_per_game", "{:.2f}"),
+        ("期望进球 xG", "xG", "xg_per_game", "{:.2f}"),
+        ("期望失球 xGA", "xGA", "xga_per_game", "{:.2f}"),
+        ("零封率", "Clean Sheet %", "clean_sheet_rate", "{:.0%}"),
+        ("关键传球", "Key Passes", "key_passes_per_game", "{:.1f}"),
     ]
-    for i, (en, zh) in enumerate(rows):
+    for i, (zh, en, attr, fmt) in enumerate(rows):
         ry = y + Inches(i * 0.45)
         _add_panel(slide, MARGIN + Inches(7.5), ry, Inches(4.6), Inches(0.4), fill=BG_CARD if i % 2 else BG_PANEL)
         _add_textbox(slide, MARGIN + Inches(7.6), ry + Inches(0.05), Inches(2.5), Inches(0.3),
-                    f"{en}  ·  {zh}", font_size=Pt(9), color=GREY, font_name=FONT_MONO)
-        a = getattr(result.team_a_stats, en.lower().replace("/", "_").replace(" ", "_").replace("%", "_pct").replace("game", "").replace("sheet_pct", "clean_sheet_rate"), 0)
-        b = getattr(result.team_b_stats, en.lower().replace("/", "_").replace(" ", "_").replace("%", "_pct").replace("game", "").replace("sheet_pct", "clean_sheet_rate"), 0)
-        # manually map for clarity
-        mapping = {
-            "Goals/Game": ("goals_per_game", "goals_per_game", "{:.2f}"),
-            "Conceded/Game": ("conceded_per_game", "conceded_per_game", "{:.2f}"),
-            "xG": ("xg_per_game", "xg_per_game", "{:.2f}"),
-            "xGA": ("xga_per_game", "xga_per_game", "{:.2f}"),
-            "Clean Sheet %": ("clean_sheet_rate", "clean_sheet_rate", "{:.0%}"),
-            "Key Passes": ("key_passes_per_game", "key_passes_per_game", "{:.1f}"),
-        }
-        a_attr, b_attr, fmt = mapping[en]
-        a_val = getattr(result.team_a_stats, a_attr)
-        b_val = getattr(result.team_b_stats, b_attr)
+                    f"{zh}  ·  {en}", font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY)
+        a_val = getattr(result.team_a_stats, attr)
+        b_val = getattr(result.team_b_stats, attr)
         _add_textbox(slide, MARGIN + Inches(10.1), ry + Inches(0.05), Inches(0.95), Inches(0.3),
                     fmt.format(a_val), font_size=Pt(11), color=GOLD, bold=True, font_name=FONT_MONO, align=PP_ALIGN.RIGHT)
         _add_textbox(slide, MARGIN + Inches(11.1), ry + Inches(0.05), Inches(0.95), Inches(0.3),
@@ -628,7 +615,7 @@ def _page_radar(prs, result: PredictionResult) -> None:
 def _page_qualitative(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Qualitative Factors", "定性因子", 12)
+    _page_header(slide, "定性因子", "Qualitative Factors", 12)
 
     path = CHART_DIR / "qualitative.png"
     qualitative_radar(result.qualitative_a, result.qualitative_b, path)
@@ -637,30 +624,31 @@ def _page_qualitative(prs, result: PredictionResult) -> None:
     # Injury list
     y = Inches(5.0)
     _add_textbox(slide, MARGIN, y, Inches(6), Inches(0.4),
-                f"{result.match.team_a.name_en} injuries · 伤停", font_size=Pt(11), bold=True, color=GOLD, font_name=FONT_TITLE)
+                f"{result.match.team_a.name_zh} 伤停名单  ·  Injuries", font_size=Pt(12), bold=True, color=GOLD, font_name=FONT_CN_BODY)
+    impact_zh = {"critical": "关键", "moderate": "中等", "minor": "轻微"}
     for i, inj in enumerate(result.injuries_a[:3]):
         color = RED if inj.impact == "critical" else (GOLD if inj.impact == "moderate" else GREY)
         _add_textbox(slide, MARGIN + Inches(0.2), y + Inches(0.4) + Inches(i * 0.3), Inches(5.5), Inches(0.3),
-                    f"• {inj.player.name}  ({inj.impact})", font_size=Pt(10), color=color, font_name=FONT_MONO)
+                    f"• {inj.player.name}  （{impact_zh.get(inj.impact, inj.impact)}）", font_size=Pt(10), color=color, font_name=FONT_CN_BODY)
     if not result.injuries_a:
         _add_textbox(slide, MARGIN + Inches(0.2), y + Inches(0.4), Inches(5.5), Inches(0.3),
-                    "• None reported · 无", font_size=Pt(10), color=GREEN, font_name=FONT_MONO)
+                    "• 无  ·  None reported", font_size=Pt(10), color=GREEN, font_name=FONT_CN_BODY)
 
     _add_textbox(slide, MARGIN + Inches(6.5), y, Inches(6), Inches(0.4),
-                f"{result.match.team_b.name_en} injuries · 伤停", font_size=Pt(11), bold=True, color=CYAN, font_name=FONT_TITLE)
+                f"{result.match.team_b.name_zh} 伤停名单  ·  Injuries", font_size=Pt(12), bold=True, color=CYAN, font_name=FONT_CN_BODY)
     for i, inj in enumerate(result.injuries_b[:3]):
         color = RED if inj.impact == "critical" else (GOLD if inj.impact == "moderate" else GREY)
         _add_textbox(slide, MARGIN + Inches(6.7), y + Inches(0.4) + Inches(i * 0.3), Inches(5.5), Inches(0.3),
-                    f"• {inj.player.name}  ({inj.impact})", font_size=Pt(10), color=color, font_name=FONT_MONO)
+                    f"• {inj.player.name}  （{impact_zh.get(inj.impact, inj.impact)}）", font_size=Pt(10), color=color, font_name=FONT_CN_BODY)
     if not result.injuries_b:
         _add_textbox(slide, MARGIN + Inches(6.7), y + Inches(0.4), Inches(5.5), Inches(0.3),
-                    "• None reported · 无", font_size=Pt(10), color=GREEN, font_name=FONT_MONO)
+                    "• 无  ·  None reported", font_size=Pt(10), color=GREEN, font_name=FONT_CN_BODY)
 
 
 def _page_model_output(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Model Output", "模型输出", 13)
+    _page_header(slide, "三模型概率对比", "Model Output Comparison", 13)
 
     path = CHART_DIR / "probs.png"
     probability_bars(result.model_probs, path)
@@ -669,31 +657,31 @@ def _page_model_output(prs, result: PredictionResult) -> None:
     # Right: numeric table
     y = Inches(1.6)
     p = result.model_probs
-    for i, (label, vals, color) in enumerate([
-        ("ELO Model", p.elo, GOLD),
-        ("Poisson Model", p.poisson, CYAN),
-        ("XGBoost Model", p.ml, GREEN),
-        ("Consensus", p.consensus, RED),
+    for i, (label_zh, label_en, vals, color) in enumerate([
+        ("ELO 模型", "ELO Model", p.elo, GOLD),
+        ("Poisson 模型", "Poisson Model", p.poisson, CYAN),
+        ("XGBoost 模型", "XGBoost Model", p.ml, GREEN),
+        ("综合概率", "Consensus", p.consensus, RED),
     ]):
         ry = y + Inches(i * 0.85)
         _add_panel(slide, MARGIN + Inches(9.0), ry, Inches(3.1), Inches(0.75), fill=BG_CARD)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.05), Inches(2.9), Inches(0.3),
-                    label, font_size=Pt(10), color=color, bold=True, font_name=FONT_MONO)
+                    f"{label_zh}  ·  {label_en}", font_size=Pt(10), color=color, bold=True, font_name=FONT_CN_BODY)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.35), Inches(2.9), Inches(0.4),
-                    f"{vals[0]:.0%} / {vals[1]:.0%} / {vals[2]:.0%}",
-                    font_size=Pt(12), color=WHITE, bold=True, font_name=FONT_MONO)
+                    f"{vals[0]:.0%}  /  {vals[1]:.0%}  /  {vals[2]:.0%}",
+                    font_size=Pt(13), color=WHITE, bold=True, font_name=FONT_MONO)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.55), Inches(2.9), Inches(0.2),
-                    "Win / Draw / Loss", font_size=Pt(8), color=GREY, font_name=FONT_MONO)
+                    "胜 / 平 / 负  ·  Win / Draw / Loss", font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY)
 
     _add_textbox(slide, MARGIN, Inches(6.6), Inches(8), Inches(0.4),
-                f"Expected goals: {p.expected_goals[0]:.2f} — {p.expected_goals[1]:.2f}",
-                font_size=Pt(14), color=GOLD, bold=True, font_name=FONT_MONO)
+                f"预期进球  ·  Expected Goals:  {p.expected_goals[0]:.2f}  —  {p.expected_goals[1]:.2f}",
+                font_size=Pt(15), color=GOLD, bold=True, font_name=FONT_CN_BODY)
 
 
 def _page_monte_carlo(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Monte Carlo Simulation", "蒙特卡洛模拟", 14)
+    _page_header(slide, "蒙特卡洛模拟", "Monte Carlo Simulation", 14)
 
     path = CHART_DIR / "mc.png"
     score_distribution(result.monte_carlo, path)
@@ -703,37 +691,37 @@ def _page_monte_carlo(prs, result: PredictionResult) -> None:
     y = Inches(1.6)
     mc = result.monte_carlo
     for i, (label_zh, label_en, val, color) in enumerate([
-        ("胜", "Win", mc.win_a, GREEN),
-        ("平", "Draw", mc.draw, GREY),
-        ("负", "Loss", mc.win_b, RED),
+        ("主队胜", "Win", mc.win_a, GREEN),
+        ("平局", "Draw", mc.draw, GREY),
+        ("客队胜", "Loss", mc.win_b, RED),
     ]):
         ry = y + Inches(i * 1.2)
         _add_panel(slide, MARGIN + Inches(9.0), ry, Inches(3.1), Inches(1.0), fill=BG_CARD)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.05), Inches(2.9), Inches(0.3),
-                    f"{label_en}  ·  {label_zh}", font_size=Pt(10), color=color, bold=True, font_name=FONT_MONO)
+                    f"{label_zh}  ·  {label_en}", font_size=Pt(11), color=color, bold=True, font_name=FONT_CN_BODY)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.4), Inches(2.9), Inches(0.6),
                     f"{val:.1%}", font_size=Pt(32), bold=True, color=color, font_name=FONT_MONO)
     _add_textbox(slide, MARGIN + Inches(9.0), Inches(5.4), Inches(3.1), Inches(0.4),
-                f"n = {mc.simulations:,}  simulations", font_size=Pt(9), color=GREY, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
+                f"模拟次数：{mc.simulations:,}  ·  Simulations", font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
 
 
 def _page_sensitivity(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Sensitivity Analysis", "敏感性分析", 15)
+    _page_header(slide, "敏感性分析", "Sensitivity Analysis", 15)
 
     _add_textbox(slide, MARGIN, Inches(1.2), Inches(12), Inches(0.4),
-                tr("sensitivity_desc"), font_size=Pt(11), color=GREY, font_name=FONT_BODY)
+                "若以下变量翻转，结论是否会改变？", font_size=Pt(12), color=GREY, font_name=FONT_CN_BODY)
 
     # Compute sensitivity: how much each factor moves the consensus
     base = result.model_probs.consensus[0]
     factors = [
         ("ELO +50", abs(50 * 0.0015)),
-        ("Injuries cleared", 0.07),
-        ("Home advantage", 0.05),
-        ("Form swing 3 pts", 0.04),
-        ("Weather (extreme)", 0.03),
-        ("Referee strict", 0.02),
+        ("伤停恢复", 0.07),
+        ("主场优势", 0.05),
+        ("状态波动 3 分", 0.04),
+        ("极端天气", 0.03),
+        ("裁判尺度", 0.02),
     ]
     factors.sort(key=lambda x: -x[1])
     path = CHART_DIR / "sensitivity.png"
@@ -744,7 +732,7 @@ def _page_sensitivity(prs, result: PredictionResult) -> None:
 def _page_final(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Final Prediction", "最终预测", 16)
+    _page_header(slide, "最终预测", "Final Prediction", 16)
 
     team_a = result.match.team_a
     team_b = result.match.team_b
@@ -752,77 +740,79 @@ def _page_final(prs, result: PredictionResult) -> None:
 
     # Big result banner
     _add_panel(slide, MARGIN, Inches(1.4), Inches(12.1), Inches(2.0), fill=BG_PANEL)
-    pick_team = team_a if pick == "A" else (team_b if pick == "B" else None)
     pick_label_zh = team_a.name_zh if pick == "A" else (team_b.name_zh if pick == "B" else "平局")
     pick_label_en = team_a.name_en if pick == "A" else (team_b.name_en if pick == "B" else "Draw")
     _add_textbox(slide, MARGIN + Inches(0.5), Inches(1.55), Inches(11), Inches(0.4),
-                "FINAL PREDICTION  ·  最终预测", font_size=Pt(11), color=GOLD, font_name=FONT_MONO, bold=True)
+                "最终预测  ·  FINAL PREDICTION", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     _add_textbox(slide, MARGIN + Inches(0.5), Inches(2.0), Inches(11), Inches(0.8),
-                f"{pick_label_en}  ({pick_label_zh})", font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_TITLE)
+                f"{pick_label_zh}  ({pick_label_en})", font_size=Pt(40), bold=True, color=WHITE, font_name=FONT_CN_BODY)
     eg = result.model_probs.expected_goals
     _add_textbox(slide, MARGIN + Inches(0.5), Inches(2.8), Inches(11), Inches(0.5),
-                f"Expected score · 预期比分:  {eg[0]:.1f}  —  {eg[1]:.1f}",
-                font_size=Pt(16), color=GOLD, font_name=FONT_MONO, bold=True)
+                f"预期比分  ·  Expected Score:  {eg[0]:.1f}  —  {eg[1]:.1f}",
+                font_size=Pt(16), color=GOLD, font_name=FONT_CN_BODY, bold=True)
 
     # Confidence + risks
     conf_color = GREEN if result.confidence == "high" else (GOLD if result.confidence == "medium" else RED)
+    conf_zh = "高" if result.confidence == "high" else "中" if result.confidence == "medium" else "低"
     _add_panel(slide, MARGIN, Inches(3.7), Inches(5.9), Inches(3.2), fill=BG_CARD)
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(3.85), Inches(5.5), Inches(0.4),
-                "CONFIDENCE  ·  信心", font_size=Pt(11), color=GOLD, font_name=FONT_MONO, bold=True)
+                "信心指数  ·  CONFIDENCE", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(4.3), Inches(5.5), Inches(1.0),
-                result.confidence.upper(), font_size=Pt(48), bold=True, color=conf_color, font_name=FONT_TITLE)
+                f"{conf_zh}  ·  {result.confidence.upper()}", font_size=Pt(44), bold=True, color=conf_color, font_name=FONT_CN_BODY)
     p = result.model_probs.consensus
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(5.3), Inches(5.5), Inches(0.4),
-                f"Win {p[0]:.0%}  ·  Draw {p[1]:.0%}  ·  Loss {p[2]:.0%}",
-                font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+                f"胜 {p[0]:.0%}  ·  平 {p[1]:.0%}  ·  负 {p[2]:.0%}",
+                font_size=Pt(12), color=WHITE, font_name=FONT_CN_BODY)
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(5.6), Inches(5.5), Inches(0.4),
-                f"Top score: {result.monte_carlo.top_scores[0][0]}  ({result.monte_carlo.top_scores[0][1]:.1%})",
-                font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+                f"最可能比分：{result.monte_carlo.top_scores[0][0]}  （{result.monte_carlo.top_scores[0][1]:.1%}）  ·  Top Score",
+                font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
 
     # Risks
     _add_panel(slide, MARGIN + Inches(6.2), Inches(3.7), Inches(5.9), Inches(3.2), fill=BG_CARD)
     _add_textbox(slide, MARGIN + Inches(6.5), Inches(3.85), Inches(5.5), Inches(0.4),
-                "KEY RISKS  ·  关键风险", font_size=Pt(11), color=GOLD, font_name=FONT_MONO, bold=True)
+                "关键风险  ·  KEY RISKS", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     for i, risk in enumerate(result.key_risks):
         _add_textbox(slide, MARGIN + Inches(6.5), Inches(4.3) + Inches(i * 0.55), Inches(5.4), Inches(0.5),
-                    f"• {risk}", font_size=Pt(10), color=WHITE, font_name=FONT_MONO)
+                    f"• {risk}", font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
 
 
 def _page_appendix(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "Appendix", "附录", 17)
+    _page_header(slide, "附录", "Appendix", 17)
 
     _add_textbox(slide, MARGIN, Inches(1.4), Inches(12), Inches(0.4),
-                "DATA SOURCES  ·  数据来源", font_size=Pt(13), color=GOLD, font_name=FONT_MONO, bold=True)
+                "数据来源  ·  DATA SOURCES", font_size=Pt(13), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     sources = [
         "Wikipedia REST API  ·  球员信息和照片",
         "football-data.org  ·  球队国际比赛历史",
-        "Local seed squads  ·  各国阵容种子库",
-        "World Football ELO Ratings methodology",
+        "ESPN 公开 API  ·  实时赛程（已切换为主源）",
+        "本地种子阵容  ·  各国阵容种子库",
+        "World Football ELO Ratings  ·  ELO 评分方法",
     ]
     for i, s in enumerate(sources):
-        _add_textbox(slide, MARGIN + Inches(0.3), Inches(1.85) + Inches(i * 0.35), Inches(12), Inches(0.3),
-                    f"• {s}", font_size=Pt(11), color=WHITE, font_name=FONT_MONO)
+        _add_textbox(slide, MARGIN + Inches(0.3), Inches(1.85) + Inches(i * 0.32), Inches(12), Inches(0.3),
+                    f"• {s}", font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
 
-    _add_textbox(slide, MARGIN, Inches(3.5), Inches(12), Inches(0.4),
-                "METHODOLOGY  ·  方法说明", font_size=Pt(13), color=GOLD, font_name=FONT_MONO, bold=True)
+    _add_textbox(slide, MARGIN, Inches(3.7), Inches(12), Inches(0.4),
+                "方法说明  ·  METHODOLOGY", font_size=Pt(13), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     method = [
-        "1.  ELO model: base skill differential, neutral-venue adjusted",
-        "2.  Poisson + Dixon-Coles: goal-distribution with low-score correction",
-        "3.  XGBoost: gradient boosting on synthetic-but-realistic feature space",
-        "4.  Qualitative adjustments: tactical / experience / psychology / venue",
-        "5.  Monte Carlo (n=10,000): simulate match outcomes from Poisson lambdas",
-        "6.  Consensus: weighted average of 3 base models after adjustments",
+        "1.  ELO 模型：基础实力差异，中立场调整",
+        "2.  Poisson + Dixon-Coles：进球分布 + 低比分修正",
+        "3.  XGBoost：基于合成但真实的特征空间的梯度提升",
+        "4.  定性调整：战术 / 经验 / 心理 / 场地",
+        "5.  蒙特卡洛（10,000 次）：基于 Poisson 强度参数模拟比赛",
+        "6.  综合概率：三个基础模型调整后的加权平均",
     ]
     for i, m in enumerate(method):
-        _add_textbox(slide, MARGIN + Inches(0.3), Inches(3.95) + Inches(i * 0.32), Inches(12), Inches(0.3),
-                    m, font_size=Pt(10), color=WHITE, font_name=FONT_MONO)
+        _add_textbox(slide, MARGIN + Inches(0.3), Inches(4.1) + Inches(i * 0.32), Inches(12), Inches(0.3),
+                    m, font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
 
     _add_textbox(slide, MARGIN, Inches(6.2), Inches(12), Inches(0.4),
-                "DISCLAIMER  ·  免责声明", font_size=Pt(13), color=RED, font_name=FONT_MONO, bold=True)
+                "免责声明  ·  DISCLAIMER", font_size=Pt(13), color=RED, font_name=FONT_CN_BODY, bold=True)
     _add_textbox(slide, MARGIN, Inches(6.55), Inches(12), Inches(0.6),
-                tr("disclaimer_text"), font_size=Pt(10), color=GREY, font_name=FONT_MONO)
+                "本报告基于历史数据和统计模型，结果仅供参考，不构成任何投注或决策建议。",
+                font_size=Pt(11), color=GREY, font_name=FONT_CN_BODY)
 
 
 # ----------------------- main entry -----------------------

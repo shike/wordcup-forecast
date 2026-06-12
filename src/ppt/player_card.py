@@ -121,12 +121,12 @@ def render_player_card(player: Player, size: tuple[int, int] = (320, 440), kit_c
     f_stat_label = _load_font(11, bold=False)
     f_stat_value = _load_font(15, bold=True)
     stats = [
-        ("PAC", player.rating + 0.3),
-        ("SHO", player.rating + 0.1),
-        ("PAS", player.rating - 0.1),
-        ("DRI", player.rating + 0.2),
-        ("DEF", player.rating - 0.4 if pos not in ["GK", "CB", "LB", "RB"] else player.rating + 0.3),
-        ("PHY", player.rating - 0.2),
+        ("速度", player.rating + 0.3),
+        ("射门", player.rating + 0.1),
+        ("传球", player.rating - 0.1),
+        ("盘带", player.rating + 0.2),
+        ("防守", player.rating - 0.4 if pos not in ["GK", "CB", "LB", "RB"] else player.rating + 0.3),
+        ("身体", player.rating - 0.2),
     ]
     for i, (label, val) in enumerate(stats):
         col = i % 3
