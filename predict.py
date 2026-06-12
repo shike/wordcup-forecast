@@ -86,17 +86,23 @@ def resolve_team(query: str):
     return teams[0]
 
 
-def _resolve_fixture_team(name: str):
-    """Map a fixture team name to our Team model via fuzzy match."""
+def _resolve_fixture_team(name: str, code: str | None = None):
+    """Map a fixture team name to our Team model via fuzzy match + aliases.
+
+    `code` is the 3-letter ESPN abbreviation (e.g. "USA") which gives a
+    fast exact lookup before any fuzzy matching.
+    """
+    raw = __import__("json").load(open(config.teams_json))
+    if code and code.upper() in raw:
+        from src.utils.models import Team
+        return Team(code=code.upper(), **raw[code.upper()])
     teams = search_team(name)
     if teams:
         return teams[0]
-    # try by country code or partial match
-    for code, t in [(__import__("json").load(open(config.teams_json)).get(k, {}).get("code", k), v)
-                    for k, v in __import__("json").load(open(config.teams_json)).items()]:
-        if name.lower() in t["name_en"].lower() or name in t.get("name_zh", ""):
+    for code_k, t in raw.items():
+        if name.lower() in t.get("name_en", "").lower() or name in t.get("name_zh", ""):
             from src.utils.models import Team
-            return Team(code=code, **t)
+            return Team(code=code_k, **t)
     return None
 
 
@@ -113,23 +119,40 @@ def main() -> None:
         return
 
     if args.fetch_fixtures is not None:
-        from src.data.fixtures import fetch_fixtures, filter_interesting
+        from src.data.fixtures import (
+            TIMEZONE_LABEL,
+            fetch_fixtures,
+            filter_interesting,
+            to_beijing,
+            venue_chinese,
+        )
         date_arg = None if args.fetch_fixtures == "today" else args.fetch_fixtures
         fx = fetch_fixtures(date_arg)
         if not args.all_fixtures:
             fx = filter_interesting(fx)
-        print(f"\n{len(fx)} matches")
+        print(f"\n{len(fx)} matches  ·  {TIMEZONE_LABEL}")
         print("-" * 80)
         for i, f in enumerate(fx, 1):
             print(f"  [{i}] {f.short()}")
             if f.venue:
-                print(f"        venue: {f.venue}  ·  status: {f.status}")
+                venue_zh = venue_chinese(f.venue)
+                if venue_zh and venue_zh != f.venue:
+                    print(f"        场地: {venue_zh}")
+                    print(f"        Venue: {f.venue}")
+                else:
+                    print(f"        场地: {f.venue}")
+                print(f"        状态: {f.status}")
         if fx:
-            print(f"\nTo predict match N, use: --predict-fixture N --fixture-date {date_arg or 'today'}")
+            print(f"\n预测第 N 场: --predict-fixture N --fixture-date {date_arg or 'today'}")
         return
 
     if args.predict_fixture is not None:
-        from src.data.fixtures import fetch_fixtures, filter_interesting
+        from src.data.fixtures import (
+            fetch_fixtures,
+            filter_interesting,
+            to_beijing,
+            venue_chinese,
+        )
         fx = fetch_fixtures(args.fixture_date)
         if not args.all_fixtures:
             fx = filter_interesting(fx)
@@ -138,22 +161,27 @@ def main() -> None:
             sys.exit(1)
         chosen = fx[args.predict_fixture - 1]
         logger.info(f"Predicting fixture #{args.predict_fixture}: {chosen.home_team} vs {chosen.away_team}")
-        team_a = _resolve_fixture_team(chosen.home_team)
-        team_b = _resolve_fixture_team(chosen.away_team)
+        team_a = _resolve_fixture_team(chosen.home_team, code=chosen.home_code)
+        team_b = _resolve_fixture_team(chosen.away_team, code=chosen.away_code)
         if team_a is None or team_b is None:
             logger.error(
                 f"Teams not in seed database: {chosen.home_team} / {chosen.away_team}.\n"
                 f"Add entries to data/teams.json and data/squads/ if you want to predict this match."
             )
             sys.exit(1)
+        # PPT metadata in Beijing time
+        bj = to_beijing(chosen.kickoff_utc)
+        match_date = bj[:10] if bj else datetime.now().strftime("%Y-%m-%d")
+        kickoff_cst = bj[11:] if bj else "TBD"
+        venue_zh = venue_chinese(chosen.venue) or chosen.venue or "TBD"
         from src.pipeline import run_prediction
         result = run_prediction(
             team_a=team_a, team_b=team_b,
-            match_date=(chosen.kickoff_utc or "")[:10] or datetime.now().strftime("%Y-%m-%d"),
-            stage="group", venue=chosen.venue or "TBD",
+            match_date=match_date, stage="group", venue=venue_zh,
             lang=args.lang, simulations=args.simulations,
         )
         if args.dry_run:
+            print(f"开球: {match_date} {kickoff_cst} (北京时间)  ·  场地: {venue_zh}")
             print(f"Win A: {result.model_probs.consensus[0]:.1%}")
             print(f"Draw : {result.model_probs.consensus[1]:.1%}")
             print(f"Win B: {result.model_probs.consensus[2]:.1%}")

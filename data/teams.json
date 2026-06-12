@@ -99,6 +99,36 @@
     "elo": 1820,
     "home_kit_color": "#FFFFFF"
   },
+  "CAN": {
+    "name_en": "Canada",
+    "name_zh": "加拿大",
+    "fifa_ranking": 27,
+    "confederation": "CONCACAF",
+    "coach": "Jesse Marsch",
+    "captain": "Alphonso Davies",
+    "elo": 1740,
+    "home_kit_color": "#FF0000"
+  },
+  "BIH": {
+    "name_en": "Bosnia-Herzegovina",
+    "name_zh": "波黑",
+    "fifa_ranking": 71,
+    "confederation": "UEFA",
+    "coach": "Sergej Barbarez",
+    "captain": "Edin Džeko",
+    "elo": 1540,
+    "home_kit_color": "#002395"
+  },
+  "PAR": {
+    "name_en": "Paraguay",
+    "name_zh": "巴拉圭",
+    "fifa_ranking": 42,
+    "confederation": "CONMEBOL",
+    "coach": "Alfaro Alfaro",
+    "captain": "Gustavo Gómez",
+    "elo": 1610,
+    "home_kit_color": "#D52B1E"
+  },
   "MEX": {
     "name_en": "Mexico",
     "name_zh": "墨西哥",
