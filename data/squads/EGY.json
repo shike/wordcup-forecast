@@ -1,0 +1,25 @@
+[
+  {"name": "Mohamed El Shenawy", "position": "GK", "number": 1, "age": 35, "club": "Al Ahly", "caps": 65, "goals": 0, "rating": 7.6, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Mohamed_El_Shenawy"},
+  {"name": "Ahmed Hegazi", "position": "CB", "number": 6, "age": 33, "club": "Al Ittihad", "caps": 85, "goals": 6, "rating": 7.5, "preferred_foot": "R", "height_cm": 193, "wikipedia_url": "https://en.wikipedia.org/wiki/Ahmed_Hegazi"},
+  {"name": "Mohamed Abdelmonem", "position": "CB", "number": 5, "age": 26, "club": "Nice", "caps": 28, "goals": 1, "rating": 7.4, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Mohamed_Abdelmonem"},
+  {"name": "Ali Gabr", "position": "CB", "number": 3, "age": 35, "club": "Pyramids FC", "caps": 50, "goals": 3, "rating": 7.3, "preferred_foot": "R", "height_cm": 195, "wikipedia_url": "https://en.wikipedia.org/wiki/Ali_Gabr"},
+  {"name": "Ahmed Hany", "position": "RB", "number": 2, "age": 30, "club": "Pyramids FC", "caps": 22, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Ahmed_Hany"},
+  {"name": "Mohamed Hamdy", "position": "LB", "number": 4, "age": 28, "club": "Pyramids FC", "caps": 12, "goals": 0, "rating": 7.2, "preferred_foot": "L", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Mohamed_Hamdy"},
+
+  {"name": "Mohamed Elneny", "position": "CDM", "number": 8, "age": 32, "club": "Arsenal", "caps": 92, "goals": 6, "rating": 7.4, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Mohamed_Elneny"},
+  {"name": "Tarek Hamed", "position": "CM", "number": 17, "age": 36, "club": "Zamalek", "caps": 75, "goals": 2, "rating": 7.4, "preferred_foot": "R", "height_cm": 179, "wikipedia_url": "https://en.wikipedia.org/wiki/Tarek_Hamed"},
+  {"name": "Mahmoud Trezeguet", "position": "RW", "number": 7, "age": 30, "club": "Trabzonspor", "caps": 35, "goals": 6, "rating": 7.5, "preferred_foot": "R", "height_cm": 181, "wikipedia_url": "https://en.wikipedia.org/wiki/Mahmoud_Trezeguet"},
+  {"name": "Mohamed Salah", "position": "RW", "number": 10, "age": 32, "club": "Liverpool", "caps": 100, "goals": 56, "rating": 8.8, "preferred_foot": "L", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Mohamed_Salah"},
+  {"name": "Mostafa Mohamed", "position": "ST", "number": 9, "age": 27, "club": "Nantes", "caps": 32, "goals": 12, "rating": 7.5, "preferred_foot": "R", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Mostafa_Mohamed"},
+  {"name": "Omar Marmoush", "position": "LW", "number": 11, "age": 25, "club": "Man City", "caps": 28, "goals": 8, "rating": 7.7, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Omar_Marmoush"},
+  {"name": "Emam Ashour", "position": "CAM", "number": 14, "age": 26, "club": "Al Ahly", "caps": 18, "goals": 2, "rating": 7.3, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Emam_Ashour"},
+  {"name": "Ahmed Zizo", "position": "CM", "number": 19, "age": 28, "club": "Zamalek", "caps": 22, "goals": 3, "rating": 7.3, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Ahmed_Zizo"},
+  {"name": "Ahmed Sayed Zizo", "position": "LW", "number": 19, "age": 28, "club": "Zamalek", "caps": 22, "goals": 3, "rating": 7.3, "preferred_foot": "R", "height_cm": 178},
+  {"name": "Marwan Attia", "position": "CDM", "number": 12, "age": 25, "club": "Al Ahly", "caps": 8, "goals": 0, "rating": 7.1, "preferred_foot": "R", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Marwan_Attia"},
+  {"name": "Zizo", "position": "RW", "number": 21, "age": 28, "club": "Zamalek", "caps": 22, "goals": 3, "rating": 7.3, "preferred_foot": "R", "height_cm": 178},
+  {"name": "Ramy Rabia", "position": "CB", "number": 15, "age": 31, "club": "Al Ahly", "caps": 28, "goals": 1, "rating": 7.2, "preferred_foot": "R", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Ramy_Rabia"},
+  {"name": "Mohamed Hany", "position": "RB", "number": 13, "age": 27, "club": "Al Ahly", "caps": 14, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Mohamed_Hany"},
+  {"name": "Mahmoud Hamdy", "position": "CB", "number": 16, "age": 29, "club": "Pyramids FC", "caps": 6, "goals": 0, "rating": 7.1, "preferred_foot": "R", "height_cm": 187},
+  {"name": "Hassan Ali", "position": "GK", "number": 16, "age": 32, "club": "Al Ahly", "caps": 4, "goals": 0, "rating": 7.0, "preferred_foot": "R", "height_cm": 192, "wikipedia_url": "https://en.wikipedia.org/wiki/Hassan_Ali_(Egyptian_footballer)"},
+  {"name": "Mohamed Sobhy", "position": "GK", "number": 23, "age": 26, "club": "Zamalek", "caps": 0, "goals": 0, "rating": 6.9, "preferred_foot": "R", "height_cm": 188}
+]

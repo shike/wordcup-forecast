@@ -37,6 +37,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", help="Output PPTX path")
     parser.add_argument("--simulations", type=int, default=10_000, help="Monte Carlo sim count")
     parser.add_argument("--list-teams", action="store_true", help="List known teams and exit")
+    parser.add_argument(
+        "--fetch-fixtures",
+        nargs="?",
+        const="today",
+        default=None,
+        metavar="DATE",
+        help="Fetch and list soccer fixtures for DATE (YYYY-MM-DD) or 'today' (default: today). "
+             "Add --all to see every match.",
+    )
+    parser.add_argument(
+        "--all-fixtures",
+        action="store_true",
+        help="When using --fetch-fixtures, show all matches (not just top leagues).",
+    )
+    parser.add_argument(
+        "--predict-fixture",
+        type=int,
+        metavar="N",
+        help="Predict the Nth fixture from a previous --fetch-fixtures call. "
+             "Uses the cached fixture list (most recent fetch).",
+    )
+    parser.add_argument(
+        "--fixture-date",
+        default=None,
+        help="Date for --predict-fixture in YYYY-MM-DD (default: last fetched).",
+    )
     return parser.parse_args()
 
 
@@ -60,6 +86,20 @@ def resolve_team(query: str):
     return teams[0]
 
 
+def _resolve_fixture_team(name: str):
+    """Map a fixture team name to our Team model via fuzzy match."""
+    teams = search_team(name)
+    if teams:
+        return teams[0]
+    # try by country code or partial match
+    for code, t in [(__import__("json").load(open(config.teams_json)).get(k, {}).get("code", k), v)
+                    for k, v in __import__("json").load(open(config.teams_json)).items()]:
+        if name.lower() in t["name_en"].lower() or name in t.get("name_zh", ""):
+            from src.utils.models import Team
+            return Team(code=code, **t)
+    return None
+
+
 def main() -> None:
     args = parse_args()
 
@@ -70,6 +110,58 @@ def main() -> None:
         )
         for t in teams:
             print(f"{t.code}  {t.name_zh:8s} / {t.name_en:14s}  FIFA #{t.fifa_ranking}")
+        return
+
+    if args.fetch_fixtures is not None:
+        from src.data.fixtures import fetch_fixtures, filter_interesting
+        date_arg = None if args.fetch_fixtures == "today" else args.fetch_fixtures
+        fx = fetch_fixtures(date_arg)
+        if not args.all_fixtures:
+            fx = filter_interesting(fx)
+        print(f"\n{len(fx)} matches")
+        print("-" * 80)
+        for i, f in enumerate(fx, 1):
+            print(f"  [{i}] {f.short()}")
+            if f.venue:
+                print(f"        venue: {f.venue}  ·  status: {f.status}")
+        if fx:
+            print(f"\nTo predict match N, use: --predict-fixture N --fixture-date {date_arg or 'today'}")
+        return
+
+    if args.predict_fixture is not None:
+        from src.data.fixtures import fetch_fixtures, filter_interesting
+        fx = fetch_fixtures(args.fixture_date)
+        if not args.all_fixtures:
+            fx = filter_interesting(fx)
+        if args.predict_fixture < 1 or args.predict_fixture > len(fx):
+            logger.error(f"Invalid fixture index {args.predict_fixture}. 1..{len(fx)} available.")
+            sys.exit(1)
+        chosen = fx[args.predict_fixture - 1]
+        logger.info(f"Predicting fixture #{args.predict_fixture}: {chosen.home_team} vs {chosen.away_team}")
+        team_a = _resolve_fixture_team(chosen.home_team)
+        team_b = _resolve_fixture_team(chosen.away_team)
+        if team_a is None or team_b is None:
+            logger.error(
+                f"Teams not in seed database: {chosen.home_team} / {chosen.away_team}.\n"
+                f"Add entries to data/teams.json and data/squads/ if you want to predict this match."
+            )
+            sys.exit(1)
+        from src.pipeline import run_prediction
+        result = run_prediction(
+            team_a=team_a, team_b=team_b,
+            match_date=(chosen.kickoff_utc or "")[:10] or datetime.now().strftime("%Y-%m-%d"),
+            stage="group", venue=chosen.venue or "TBD",
+            lang=args.lang, simulations=args.simulations,
+        )
+        if args.dry_run:
+            print(f"Win A: {result.model_probs.consensus[0]:.1%}")
+            print(f"Draw : {result.model_probs.consensus[1]:.1%}")
+            print(f"Win B: {result.model_probs.consensus[2]:.1%}")
+            return
+        from src.ppt.builder import build_ppt
+        output_path = Path(args.output) if args.output else None
+        ppt_path = build_ppt(result, lang=args.lang, output_path=output_path)
+        logger.success(f"PPT written: {ppt_path}")
         return
 
     if not args.team_a or not args.team_b:

@@ -149,6 +149,36 @@
     "elo": 1870,
     "home_kit_color": "#C1272D"
   },
+  "BEL": {
+    "name_en": "Belgium",
+    "name_zh": "比利时",
+    "fifa_ranking": 8,
+    "confederation": "UEFA",
+    "coach": "Domenico Tedesco",
+    "captain": "Kevin De Bruyne",
+    "elo": 1955,
+    "home_kit_color": "#C8102E"
+  },
+  "EGY": {
+    "name_en": "Egypt",
+    "name_zh": "埃及",
+    "fifa_ranking": 33,
+    "confederation": "CAF",
+    "coach": "Hossam Hassan",
+    "captain": "Mohamed Salah",
+    "elo": 1700,
+    "home_kit_color": "#CE1126"
+  },
+  "CPV": {
+    "name_en": "Cape Verde",
+    "name_zh": "佛得角",
+    "fifa_ranking": 38,
+    "confederation": "CAF",
+    "coach": "Pedro Leitão",
+    "captain": "Ryan Mendes",
+    "elo": 1640,
+    "home_kit_color": "#003893"
+  },
   "SEN": {
     "name_en": "Senegal",
     "name_zh": "塞内加尔",

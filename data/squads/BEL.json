@@ -1,0 +1,27 @@
+[
+  {"name": "Koen Casteels", "position": "GK", "number": 1, "age": 32, "club": "Al-Qadisiyah", "caps": 11, "goals": 0, "rating": 7.5, "preferred_foot": "L", "height_cm": 197, "wikipedia_url": "https://en.wikipedia.org/wiki/Koen_Casteels"},
+  {"name": "Matz Sels", "position": "GK", "number": 13, "age": 33, "club": "Nottingham Forest", "caps": 9, "goals": 0, "rating": 7.4, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Matz_Sels"},
+  {"name": "Thomas Kaminski", "position": "GK", "number": 12, "age": 32, "club": "Lille", "caps": 2, "goals": 0, "rating": 7.0, "preferred_foot": "R", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/Thomas_Kaminski"},
+
+  {"name": "Timothy Castagne", "position": "RB", "number": 2, "age": 29, "club": "Fulham", "caps": 42, "goals": 2, "rating": 7.5, "preferred_foot": "R", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Timothy_Castagne"},
+  {"name": "Wout Faes", "position": "CB", "number": 4, "age": 26, "club": "Leicester", "caps": 21, "goals": 0, "rating": 7.5, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Wout_Faes"},
+  {"name": "Jan Vertonghen", "position": "CB", "number": 5, "age": 37, "club": "Anderlecht", "caps": 154, "goals": 10, "rating": 7.6, "preferred_foot": "L", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/Jan_Vertonghen"},
+  {"name": "Arthur Theate", "position": "CB", "number": 3, "age": 25, "club": "Rennes", "caps": 19, "goals": 0, "rating": 7.4, "preferred_foot": "L", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Arthur_Theate"},
+  {"name": "Axel Witsel", "position": "CB", "number": 6, "age": 36, "club": "Atletico Madrid", "caps": 138, "goals": 12, "rating": 7.6, "preferred_foot": "R", "height_cm": 186, "wikipedia_url": "https://en.wikipedia.org/wiki/Axel_Witsel"},
+
+  {"name": "Kevin De Bruyne", "position": "CM", "number": 7, "age": 33, "club": "Man City", "caps": 102, "goals": 28, "rating": 8.7, "preferred_foot": "R", "height_cm": 181, "wikipedia_url": "https://en.wikipedia.org/wiki/Kevin_De_Bruyne"},
+  {"name": "Youri Tielemans", "position": "CM", "number": 8, "age": 27, "club": "Aston Villa", "caps": 73, "goals": 7, "rating": 7.8, "preferred_foot": "R", "height_cm": 176, "wikipedia_url": "https://en.wikipedia.org/wiki/Youri_Tielemans"},
+  {"name": "Amadou Onana", "position": "CDM", "number": 18, "age": 23, "club": "Aston Villa", "caps": 22, "goals": 1, "rating": 7.7, "preferred_foot": "R", "height_cm": 195, "wikipedia_url": "https://en.wikipedia.org/wiki/Amadou_Onana"},
+  {"name": "Orel Mangala", "position": "CDM", "number": 15, "age": 26, "club": "Everton", "caps": 12, "goals": 0, "rating": 7.4, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Orel_Mangala"},
+  {"name": "Charles De Ketelaere", "position": "CAM", "number": 11, "age": 24, "club": "Atalanta", "caps": 21, "goals": 2, "rating": 7.6, "preferred_foot": "L", "height_cm": 192, "wikipedia_url": "https://en.wikipedia.org/wiki/Charles_De_Ketelaere"},
+
+  {"name": "Jérémy Doku", "position": "LW", "number": 22, "age": 22, "club": "Man City", "caps": 22, "goals": 2, "rating": 7.8, "preferred_foot": "L", "height_cm": 173, "wikipedia_url": "https://en.wikipedia.org/wiki/J%C3%A9r%C3%A9my_Doku"},
+  {"name": "Leandro Trossard", "position": "LW", "number": 17, "age": 29, "club": "Arsenal", "caps": 38, "goals": 7, "rating": 7.6, "preferred_foot": "L", "height_cm": 172, "wikipedia_url": "https://en.wikipedia.org/wiki/Leandro_Trossard"},
+  {"name": "Romelu Lukaku", "position": "ST", "number": 9, "age": 31, "club": "Napoli", "caps": 119, "goals": 85, "rating": 8.2, "preferred_foot": "L", "height_cm": 190, "wikipedia_url": "https://en.wikipedia.org/wiki/Romelu_Lukaku"},
+  {"name": "Loïs Openda", "position": "ST", "number": 20, "age": 24, "club": "RB Leipzig", "caps": 16, "goals": 6, "rating": 7.6, "preferred_foot": "R", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Lo%C3%AFs_Openda"},
+  {"name": "Dodi Lukebakio", "position": "RW", "number": 14, "age": 27, "club": "Sevilla", "caps": 12, "goals": 1, "rating": 7.3, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Dodi_Lukebakio"},
+  {"name": "Johan Bakayoko", "position": "RW", "number": 19, "age": 22, "club": "PSV", "caps": 8, "goals": 1, "rating": 7.4, "preferred_foot": "L", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Johan_Bakayoko"},
+  {"name": "Thomas Meunier", "position": "RB", "number": 16, "age": 33, "club": "Lille", "caps": 65, "goals": 8, "rating": 7.3, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Thomas_Meunier"},
+  {"name": "Maxim De Cuyper", "position": "LB", "number": 21, "age": 24, "club": "Brighton", "caps": 2, "goals": 0, "rating": 7.2, "preferred_foot": "L", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Maxim_De_Cuyper"},
+  {"name": "Zeno Debast", "position": "CB", "number": 24, "age": 21, "club": "Sporting CP", "caps": 8, "goals": 0, "rating": 7.5, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Zeno_Debast"}
+]

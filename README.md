@@ -17,6 +17,12 @@ python predict.py --team-a Brazil --team-b Argentina --dry-run
 # full prediction + PPT
 python predict.py --team-a Brazil --team-b Argentina \
   --match-date 2026-07-05 --stage final --simulations 10000
+
+# fetch tonight's fixtures (bypasses WebSearch/WebFetch tool restrictions)
+python predict.py --fetch-fixtures 2026-06-15
+
+# predict the Nth fixture from the list
+python predict.py --predict-fixture 1 --fixture-date 2026-06-15
 ```
 
 PPT outputs to `./output/{TeamA}_vs_{TeamB}_{date}.pptx`.
@@ -55,9 +61,9 @@ PPT outputs to `./output/{TeamA}_vs_{TeamB}_{date}.pptx`.
 
 ## 已支持的球队（带真实阵容）
 
-BRA / ARG / FRA / ENG / GER / ESP / POR
+BRA / ARG / FRA / ENG / GER / ESP / POR / BEL / EGY
 
-其他球队（NED, ITA, USA, MEX, JPN, KOR, AUS, MAR, SEN）首次运行会生成占位阵容，球员数据可在 `data/squads/{CODE}.json` 中替换。
+其他球队（NED, ITA, USA, MEX, JPN, KOR, AUS, MAR, SEN, CPV）首次运行会生成占位阵容，球员数据可在 `data/squads/{CODE}.json` 中替换。
 
 ## 项目结构
 
