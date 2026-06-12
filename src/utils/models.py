@@ -93,6 +93,16 @@ class TeamStats(BaseModel):
     avg_player_rating: float = 7.0
     starter_strength: float = 80.0
     bench_strength: float = 60.0
+    # #6 VAR / 裁判相关
+    cards_per_game: float = 1.8           # 黄红牌数
+    fouls_per_game: float = 11.0
+    # #9 赛程密度
+    days_since_last_match: int = 6
+    matches_in_last_7_days: int = 1
+    # #10 定位球 / 持球
+    set_piece_goals_pct: float = 0.25    # 定位球进球占比
+    possession_avg: float = 0.50
+    pressing_intensity: float = 0.50      # 0-1, 越高越积极
 
 
 class QualitativeFactors(BaseModel):
@@ -119,6 +129,10 @@ class ModelProbabilities(BaseModel):
     consensus: tuple[float, float, float]
     expected_goals: tuple[float, float]  # (a, b)
     confidence: Literal["high", "medium", "low"] = "medium"
+    # #11 模型分歧度：3 个模型 pairwise variance（0=完全一致）
+    divergence: float = 0.0
+    # #7 市场隐含概率（来自 Poisson 反推 vs consensus）
+    market_consensus_gap: float = 0.0  # market - consensus (positive = market more bullish A)
 
 
 class MonteCarloResult(BaseModel):

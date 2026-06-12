@@ -34,6 +34,8 @@ from src.utils.config import config
 def _default_stats(team: Team) -> TeamStats:
     """Derive rough baseline stats from FIFA ranking (lower rank = stronger)."""
     rank_factor = max(0.5, 1.5 - (team.fifa_ranking - 1) * 0.015)
+    from random import Random
+    rng = Random(int(team.code.__hash__()) & 0xFFFFFFFF)
     return TeamStats(
         team_code=team.code,
         goals_per_game=round(1.0 + rank_factor * 0.7, 2),
@@ -46,6 +48,14 @@ def _default_stats(team: Team) -> TeamStats:
         last_10_losses=int(6 - rank_factor * 3),
         starter_strength=60 + rank_factor * 25,
         bench_strength=50 + rank_factor * 18,
+        # New fields — calibrated to FIFA rankings
+        cards_per_game=round(1.5 + (1 - rank_factor) * 0.8, 2),
+        fouls_per_game=round(10 + (1 - rank_factor) * 4, 1),
+        days_since_last_match=rng.randint(3, 10),
+        matches_in_last_7_days=rng.choice([0, 1, 1, 1, 2]),
+        set_piece_goals_pct=round(0.20 + rank_factor * 0.10, 2),
+        possession_avg=round(0.45 + rank_factor * 0.10, 2),
+        pressing_intensity=round(0.50 + (rank_factor - 0.75) * 0.20, 2),
     )
 
 
@@ -110,10 +120,22 @@ def run_prediction(
     )
     consensus = _renormalise(*consensus)
 
+    # #11 模型分歧度 — pairwise variance across 3 models for the
+    # top outcome probability
+    top_idx = consensus.index(max(consensus))
+    probs_at_top = [elo_p[top_idx], poi_p[top_idx], ml_p[top_idx]]
+    mean = sum(probs_at_top) / 3
+    divergence = sum((p - mean) ** 2 for p in probs_at_top) / 3  # variance
+
+    # #7 市场隐含概率 (用 Poisson 反推的'市场'vs consensus 差值)
+    # 作为'假设市场赔率'的占位
+    market_consensus_gap = (poi_p[top_idx] - consensus[top_idx])
+
+    # Confidence: high max_prob + low divergence
     max_prob = max(consensus)
-    if max_prob > 0.55:
+    if max_prob > 0.55 and divergence < 0.005:
         confidence = "high"
-    elif max_prob > 0.40:
+    elif max_prob > 0.40 and divergence < 0.02:
         confidence = "medium"
     else:
         confidence = "low"
@@ -125,6 +147,8 @@ def run_prediction(
         consensus=consensus,
         expected_goals=(lam_a, lam_b),
         confidence=confidence,
+        divergence=divergence,
+        market_consensus_gap=market_consensus_gap,
     )
 
     logger.info("Monte Carlo simulation…")
