@@ -1,0 +1,28 @@
+[
+  {"name": "Diogo Costa", "position": "GK", "number": 1, "age": 25, "club": "Porto", "caps": 47, "goals": 0, "rating": 8.0, "preferred_foot": "R", "height_cm": 186, "wikipedia_url": "https://en.wikipedia.org/wiki/Diogo_Costa"},
+  {"name": "Rui Patrício", "position": "GK", "number": 12, "age": 36, "club": "Roma", "caps": 110, "goals": 0, "rating": 7.4, "preferred_foot": "L", "height_cm": 190, "wikipedia_url": "https://en.wikipedia.org/wiki/Rui_Patr%C3%ADcio"},
+  {"name": "José Sá", "position": "GK", "number": 22, "age": 31, "club": "Wolves", "caps": 2, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 192, "wikipedia_url": "https://en.wikipedia.org/wiki/Jos%C3%A9_S%C3%A1_(footballer,_born_1993)"},
+
+  {"name": "Diogo Dalot", "position": "RB", "number": 2, "age": 25, "club": "Man United", "caps": 28, "goals": 2, "rating": 7.7, "preferred_foot": "R", "height_cm": 184, "wikipedia_url": "https://en.wikipedia.org/wiki/Diogo_Dalot"},
+  {"name": "Rúben Dias", "position": "CB", "number": 4, "age": 27, "club": "Man City", "caps": 60, "goals": 3, "rating": 8.3, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/R%C3%BAben_Dias"},
+  {"name": "Pepe", "position": "CB", "number": 3, "age": 41, "club": "Porto", "caps": 142, "goals": 8, "rating": 7.6, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Pepe_(footballer,_born_1983)"},
+  {"name": "Nuno Mendes", "position": "LB", "number": 19, "age": 22, "club": "PSG", "caps": 22, "goals": 0, "rating": 7.7, "preferred_foot": "L", "height_cm": 176, "wikipedia_url": "https://en.wikipedia.org/wiki/Nuno_Mendes"},
+  {"name": "Raphaël Guerreiro", "position": "LB", "number": 5, "age": 30, "club": "Bayern", "caps": 60, "goals": 4, "rating": 7.5, "preferred_foot": "L", "height_cm": 170, "wikipedia_url": "https://en.wikipedia.org/wiki/Rapha%C3%ABl_Guerreiro"},
+
+  {"name": "Bruno Fernandes", "position": "CM", "number": 8, "age": 30, "club": "Man United", "caps": 65, "goals": 16, "rating": 8.2, "preferred_foot": "R", "height_cm": 179, "wikipedia_url": "https://en.wikipedia.org/wiki/Bruno_Fernandes"},
+  {"name": "Vitinha", "position": "CM", "number": 6, "age": 24, "club": "PSG", "caps": 18, "goals": 0, "rating": 7.9, "preferred_foot": "R", "height_cm": 172, "wikipedia_url": "https://en.wikipedia.org/wiki/Vitinha_(footballer,_born_2000)"},
+  {"name": "Bernardo Silva", "position": "CM", "number": 10, "age": 30, "club": "Man City", "caps": 95, "goals": 14, "rating": 8.2, "preferred_foot": "L", "height_cm": 173, "wikipedia_url": "https://en.wikipedia.org/wiki/Bernardo_Silva"},
+  {"name": "Palhinha", "position": "CDM", "number": 14, "age": 29, "club": "Bayern", "caps": 30, "goals": 2, "rating": 7.7, "preferred_foot": "R", "height_cm": 190, "wikipedia_url": "https://en.wikipedia.org/wiki/Palhinha_(footballer)"},
+  {"name": "João Palhinha", "position": "CDM", "number": 14, "age": 29, "club": "Bayern", "caps": 30, "goals": 2, "rating": 7.7, "preferred_foot": "R", "height_cm": 190},
+
+  {"name": "Rafael Leão", "position": "LW", "number": 17, "age": 25, "club": "AC Milan", "caps": 30, "goals": 4, "rating": 7.9, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Rafael_Le%C3%A3o"},
+  {"name": "Cristiano Ronaldo", "position": "ST", "number": 7, "age": 40, "club": "Al-Nassr", "caps": 216, "goals": 135, "rating": 8.0, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Cristiano_Ronaldo"},
+  {"name": "Gonçalo Ramos", "position": "ST", "number": 9, "age": 23, "club": "PSG", "caps": 19, "goals": 14, "rating": 7.7, "preferred_foot": "R", "height_cm": 184, "wikipedia_url": "https://en.wikipedia.org/wiki/Gon%C3%A7alo_Ramos"},
+  {"name": "Pedro Neto", "position": "RW", "number": 20, "age": 24, "club": "Chelsea", "caps": 11, "goals": 2, "rating": 7.4, "preferred_foot": "R", "height_cm": 172, "wikipedia_url": "https://en.wikipedia.org/wiki/Pedro_Neto"},
+  {"name": "Diogo Jota", "position": "ST", "number": 21, "age": 28, "club": "Liverpool", "caps": 35, "goals": 14, "rating": 7.8, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Diogo_Jota"},
+  {"name": "João Félix", "position": "CAM", "number": 11, "age": 25, "club": "Barcelona", "caps": 36, "goals": 8, "rating": 7.6, "preferred_foot": "R", "height_cm": 181, "wikipedia_url": "https://en.wikipedia.org/wiki/Jo%C3%A3o_F%C3%A9lix"},
+
+  {"name": "António Silva", "position": "CB", "number": 13, "age": 21, "club": "Benfica", "caps": 9, "goals": 0, "rating": 7.4, "preferred_foot": "R", "height_cm": 186, "wikipedia_url": "https://en.wikipedia.org/wiki/Ant%C3%B3nio_Silva_(footballer,_born_2003)"},
+  {"name": "Rúben Neves", "position": "CM", "number": 18, "age": 27, "club": "Al-Hilal", "caps": 47, "goals": 4, "rating": 7.5, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/R%C3%BAben_Neves"},
+  {"name": "Cancelo", "position": "RB", "number": 15, "age": 30, "club": "Barcelona", "caps": 55, "goals": 4, "rating": 7.7, "preferred_foot": "R", "height_cm": 182, "wikipedia_url": "https://en.wikipedia.org/wiki/Jo%C3%A3o_Cancelo"}
+]

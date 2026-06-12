@@ -1,0 +1,28 @@
+[
+  {"name": "Emiliano Martínez", "position": "GK", "number": 1, "age": 32, "club": "Aston Villa", "caps": 50, "goals": 0, "rating": 8.4, "preferred_foot": "R", "height_cm": 195, "wikipedia_url": "https://en.wikipedia.org/wiki/Emiliano_Mart%C3%ADnez"},
+  {"name": "Franco Armani", "position": "GK", "number": 12, "age": 38, "club": "River Plate", "caps": 23, "goals": 0, "rating": 7.5, "preferred_foot": "R", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/Franco_Armani"},
+  {"name": "Geronimo Rulli", "position": "GK", "number": 23, "age": 32, "club": "Marseille", "caps": 6, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/Ger%C3%B3nimo_Rulli"},
+
+  {"name": "Nahuel Molina", "position": "RB", "number": 4, "age": 26, "club": "Atletico Madrid", "caps": 45, "goals": 1, "rating": 7.8, "preferred_foot": "R", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Nahuel_Molina"},
+  {"name": "Cristian Romero", "position": "CB", "number": 13, "age": 26, "club": "Tottenham", "caps": 35, "goals": 3, "rating": 8.2, "preferred_foot": "R", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Cristian_Romero"},
+  {"name": "Lisandro Martínez", "position": "CB", "number": 25, "age": 27, "club": "Man United", "caps": 23, "goals": 1, "rating": 8.0, "preferred_foot": "L", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Lisandro_Mart%C3%ADnez"},
+  {"name": "Nicolás Otamendi", "position": "CB", "number": 19, "age": 36, "club": "Benfica", "caps": 117, "goals": 6, "rating": 7.6, "preferred_foot": "R", "height_cm": 183, "wikipedia_url": "https://en.wikipedia.org/wiki/Nicol%C3%A1s_Otamendi"},
+  {"name": "Marcos Acuña", "position": "LB", "number": 8, "age": 33, "club": "River Plate", "caps": 60, "goals": 1, "rating": 7.5, "preferred_foot": "L", "height_cm": 172, "wikipedia_url": "https://en.wikipedia.org/wiki/Marcos_Acu%C3%B1a"},
+
+  {"name": "Rodrigo De Paul", "position": "CM", "number": 7, "age": 30, "club": "Atletico Madrid", "caps": 65, "goals": 2, "rating": 8.1, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Rodrigo_De_Paul"},
+  {"name": "Enzo Fernández", "position": "CM", "number": 24, "age": 24, "club": "Chelsea", "caps": 33, "goals": 4, "rating": 8.2, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Enzo_Fern%C3%A1ndez"},
+  {"name": "Alexis Mac Allister", "position": "CM", "number": 20, "age": 26, "club": "Liverpool", "caps": 31, "goals": 3, "rating": 8.0, "preferred_foot": "R", "height_cm": 174, "wikipedia_url": "https://en.wikipedia.org/wiki/Alexis_Mac_Allister"},
+
+  {"name": "Lionel Messi", "position": "RW", "number": 10, "age": 37, "club": "Inter Miami", "caps": 191, "goals": 112, "rating": 9.0, "preferred_foot": "L", "height_cm": 170, "wikipedia_url": "https://en.wikipedia.org/wiki/Lionel_Messi"},
+  {"name": "Lautaro Martínez", "position": "ST", "number": 22, "age": 27, "club": "Inter", "caps": 60, "goals": 30, "rating": 8.5, "preferred_foot": "R", "height_cm": 174, "wikipedia_url": "https://en.wikipedia.org/wiki/Lautaro_Mart%C3%ADnez"},
+  {"name": "Julián Álvarez", "position": "ST", "number": 9, "age": 25, "club": "Atletico Madrid", "caps": 38, "goals": 11, "rating": 8.3, "preferred_foot": "R", "height_cm": 173, "wikipedia_url": "https://en.wikipedia.org/wiki/Juli%C3%A1n_%C3%81lvarez"},
+  {"name": "Ángel Di María", "position": "RW", "number": 11, "age": 36, "club": "Benfica", "caps": 145, "goals": 31, "rating": 7.8, "preferred_foot": "L", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/%C3%81ngel_Di_Mar%C3%ADa"},
+  {"name": "Giovani Lo Celso", "position": "CAM", "number": 18, "age": 28, "club": "Real Betis", "caps": 32, "goals": 2, "rating": 7.7, "preferred_foot": "L", "height_cm": 177, "wikipedia_url": "https://en.wikipedia.org/wiki/Giovani_Lo_Celso"},
+
+  {"name": "Exequiel Palacios", "position": "CM", "number": 14, "age": 26, "club": "Bayer Leverkusen", "caps": 30, "goals": 1, "rating": 7.6, "preferred_foot": "R", "height_cm": 179, "wikipedia_url": "https://en.wikipedia.org/wiki/Exequiel_Palacios"},
+  {"name": "Leandro Paredes", "position": "CDM", "number": 5, "age": 30, "club": "Roma", "caps": 60, "goals": 4, "rating": 7.5, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Leandro_Paredes"},
+  {"name": "Gonzalo Montiel", "position": "RB", "number": 2, "age": 27, "club": "Sevilla", "caps": 28, "goals": 1, "rating": 7.4, "preferred_foot": "R", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Gonzalo_Montiel"},
+  {"name": "Germán Pezzella", "position": "CB", "number": 6, "age": 33, "club": "River Plate", "caps": 30, "goals": 2, "rating": 7.4, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Germ%C3%A1n_Pezzella"},
+  {"name": "Thiago Almada", "position": "CAM", "number": 16, "age": 23, "club": "Botafogo", "caps": 8, "goals": 1, "rating": 7.4, "preferred_foot": "L", "height_cm": 173, "wikipedia_url": "https://en.wikipedia.org/wiki/Thiago_Almada"},
+  {"name": "Valentin Carboni", "position": "CAM", "number": 21, "age": 20, "club": "Monza", "caps": 3, "goals": 0, "rating": 7.0, "preferred_foot": "L", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Valent%C3%ADn_Carboni"}
+]

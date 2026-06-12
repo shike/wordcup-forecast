@@ -1,0 +1,28 @@
+[
+  {"name": "Unai Simón", "position": "GK", "number": 1, "age": 27, "club": "Athletic Bilbao", "caps": 42, "goals": 0, "rating": 7.9, "preferred_foot": "R", "height_cm": 190, "wikipedia_url": "https://en.wikipedia.org/wiki/Unai_Sim%C3%B3n"},
+  {"name": "David Raya", "position": "GK", "number": 13, "age": 29, "club": "Arsenal", "caps": 6, "goals": 0, "rating": 7.5, "preferred_foot": "R", "height_cm": 183, "wikipedia_url": "https://en.wikipedia.org/wiki/David_Raya"},
+  {"name": "Álex Remiro", "position": "GK", "number": 23, "age": 29, "club": "Real Sociedad", "caps": 2, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/%C3%81lex_Remiro"},
+
+  {"name": "Dani Carvajal", "position": "RB", "number": 2, "age": 32, "club": "Real Madrid", "caps": 50, "goals": 1, "rating": 7.9, "preferred_foot": "R", "height_cm": 173, "wikipedia_url": "https://en.wikipedia.org/wiki/Dani_Carvajal"},
+  {"name": "Robin Le Normand", "position": "CB", "number": 5, "age": 27, "club": "Real Sociedad", "caps": 24, "goals": 0, "rating": 7.9, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Robin_Le_Normand"},
+  {"name": "Aymeric Laporte", "position": "CB", "number": 14, "age": 30, "club": "Al-Nassr", "caps": 30, "goals": 2, "rating": 7.8, "preferred_foot": "L", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Aymeric_Laporte"},
+  {"name": "Pau Cubarsí", "position": "CB", "number": 4, "age": 17, "club": "Barcelona", "caps": 5, "goals": 0, "rating": 7.5, "preferred_foot": "R", "height_cm": 184, "wikipedia_url": "https://en.wikipedia.org/wiki/Pau_Cubars%C3%AD"},
+  {"name": "Jordi Alba", "position": "LB", "number": 18, "age": 35, "club": "Inter Miami", "caps": 93, "goals": 9, "rating": 7.4, "preferred_foot": "L", "height_cm": 170, "wikipedia_url": "https://en.wikipedia.org/wiki/Jordi_Alba"},
+  {"name": "Alejandro Balde", "position": "LB", "number": 3, "age": 21, "club": "Barcelona", "caps": 8, "goals": 0, "rating": 7.4, "preferred_foot": "L", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Alejandro_Balde"},
+
+  {"name": "Rodri", "position": "CDM", "number": 16, "age": 28, "club": "Man City", "caps": 60, "goals": 4, "rating": 8.6, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Rodri_(footballer,_born_1996)"},
+  {"name": "Pedri", "position": "CM", "number": 8, "age": 22, "club": "Barcelona", "caps": 25, "goals": 2, "rating": 8.3, "preferred_foot": "R", "height_cm": 174, "wikipedia_url": "https://en.wikipedia.org/wiki/Pedri"},
+  {"name": "Gavi", "position": "CM", "number": 9, "age": 20, "club": "Barcelona", "caps": 27, "goals": 5, "rating": 8.0, "preferred_foot": "R", "height_cm": 173, "wikipedia_url": "https://en.wikipedia.org/wiki/Gavi_(footballer)"},
+
+  {"name": "Lamine Yamal", "position": "RW", "number": 19, "age": 17, "club": "Barcelona", "caps": 17, "goals": 6, "rating": 8.3, "preferred_foot": "L", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Lamine_Yamal"},
+  {"name": "Álvaro Morata", "position": "ST", "number": 7, "age": 32, "club": "AC Milan", "caps": 80, "goals": 36, "rating": 7.7, "preferred_foot": "R", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/%C3%81lvaro_Morata"},
+  {"name": "Ferran Torres", "position": "LW", "number": 11, "age": 24, "club": "Barcelona", "caps": 41, "goals": 19, "rating": 7.6, "preferred_foot": "R", "height_cm": 184, "wikipedia_url": "https://en.wikipedia.org/wiki/Ferran_Torres"},
+  {"name": "Nico Williams", "position": "LW", "number": 17, "age": 22, "club": "Athletic Bilbao", "caps": 14, "goals": 3, "rating": 7.9, "preferred_foot": "R", "height_cm": 181, "wikipedia_url": "https://en.wikipedia.org/wiki/Nico_Williams"},
+  {"name": "Dani Olmo", "position": "CAM", "number": 10, "age": 26, "club": "Barcelona", "caps": 38, "goals": 11, "rating": 7.9, "preferred_foot": "R", "height_cm": 179, "wikipedia_url": "https://en.wikipedia.org/wiki/Dani_Olmo"},
+
+  {"name": "Fabián Ruiz", "position": "CM", "number": 6, "age": 28, "club": "PSG", "caps": 26, "goals": 4, "rating": 7.7, "preferred_foot": "L", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/Fabi%C3%A1n_Ruiz"},
+  {"name": "Mikel Merino", "position": "CM", "number": 15, "age": 28, "club": "Arsenal", "caps": 26, "goals": 6, "rating": 7.6, "preferred_foot": "L", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Mikel_Merino"},
+  {"name": "Marc Cucurella", "position": "LB", "number": 24, "age": 26, "club": "Chelsea", "caps": 11, "goals": 0, "rating": 7.4, "preferred_foot": "L", "height_cm": 172, "wikipedia_url": "https://en.wikipedia.org/wiki/Marc_Cucurella"},
+  {"name": "Joselu", "position": "ST", "number": 21, "age": 34, "club": "Al-Gharafa", "caps": 12, "goals": 5, "rating": 7.4, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Joselu_(footballer,_born_1990)"},
+  {"name": "Yeremy Pino", "position": "RW", "number": 20, "age": 22, "club": "Crystal Palace", "caps": 4, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 172, "wikipedia_url": "https://en.wikipedia.org/wiki/Yeremy_Pino"}
+]

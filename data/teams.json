@@ -1,0 +1,162 @@
+{
+  "BRA": {
+    "name_en": "Brazil",
+    "name_zh": "巴西",
+    "fifa_ranking": 5,
+    "confederation": "CONMEBOL",
+    "coach": "Dorival Júnior",
+    "captain": "Marquinhos",
+    "elo": 1980,
+    "home_kit_color": "#FFDF00"
+  },
+  "ARG": {
+    "name_en": "Argentina",
+    "name_zh": "阿根廷",
+    "fifa_ranking": 1,
+    "confederation": "CONMEBOL",
+    "coach": "Lionel Scaloni",
+    "captain": "Lionel Messi",
+    "elo": 2130,
+    "home_kit_color": "#75AADB"
+  },
+  "FRA": {
+    "name_en": "France",
+    "name_zh": "法国",
+    "fifa_ranking": 2,
+    "confederation": "UEFA",
+    "coach": "Didier Deschamps",
+    "captain": "Kylian Mbappé",
+    "elo": 2050,
+    "home_kit_color": "#002395"
+  },
+  "ENG": {
+    "name_en": "England",
+    "name_zh": "英格兰",
+    "fifa_ranking": 4,
+    "confederation": "UEFA",
+    "coach": "Thomas Tuchel",
+    "captain": "Harry Kane",
+    "elo": 1990,
+    "home_kit_color": "#FFFFFF"
+  },
+  "GER": {
+    "name_en": "Germany",
+    "name_zh": "德国",
+    "fifa_ranking": 9,
+    "confederation": "UEFA",
+    "coach": "Julian Nagelsmann",
+    "captain": "Joshua Kimmich",
+    "elo": 1945,
+    "home_kit_color": "#FFFFFF"
+  },
+  "ESP": {
+    "name_en": "Spain",
+    "name_zh": "西班牙",
+    "fifa_ranking": 3,
+    "confederation": "UEFA",
+    "coach": "Luis de la Fuente",
+    "captain": "Rodri",
+    "elo": 2025,
+    "home_kit_color": "#AA151B"
+  },
+  "POR": {
+    "name_en": "Portugal",
+    "name_zh": "葡萄牙",
+    "fifa_ranking": 6,
+    "confederation": "UEFA",
+    "coach": "Roberto Martínez",
+    "captain": "Cristiano Ronaldo",
+    "elo": 1970,
+    "home_kit_color": "#FF0000"
+  },
+  "NED": {
+    "name_en": "Netherlands",
+    "name_zh": "荷兰",
+    "fifa_ranking": 7,
+    "confederation": "UEFA",
+    "coach": "Ronald Koeman",
+    "captain": "Virgil van Dijk",
+    "elo": 1965,
+    "home_kit_color": "#FF6600"
+  },
+  "ITA": {
+    "name_en": "Italy",
+    "name_zh": "意大利",
+    "fifa_ranking": 11,
+    "confederation": "UEFA",
+    "coach": "Luciano Spalletti",
+    "captain": "Gianluigi Donnarumma",
+    "elo": 1880,
+    "home_kit_color": "#0066CC"
+  },
+  "USA": {
+    "name_en": "USA",
+    "name_zh": "美国",
+    "fifa_ranking": 16,
+    "confederation": "CONCACAF",
+    "coach": "Mauricio Pochettino",
+    "captain": "Christian Pulisic",
+    "elo": 1820,
+    "home_kit_color": "#FFFFFF"
+  },
+  "MEX": {
+    "name_en": "Mexico",
+    "name_zh": "墨西哥",
+    "fifa_ranking": 14,
+    "confederation": "CONCACAF",
+    "coach": "Javier Aguirre",
+    "captain": "Guillermo Ochoa",
+    "elo": 1850,
+    "home_kit_color": "#006847"
+  },
+  "JPN": {
+    "name_en": "Japan",
+    "name_zh": "日本",
+    "fifa_ranking": 18,
+    "confederation": "AFC",
+    "coach": "Hajime Moriyasu",
+    "captain": "Wataru Endo",
+    "elo": 1810,
+    "home_kit_color": "#BC002D"
+  },
+  "KOR": {
+    "name_en": "South Korea",
+    "name_zh": "韩国",
+    "fifa_ranking": 22,
+    "confederation": "AFC",
+    "coach": "Hong Myung-bo",
+    "captain": "Son Heung-min",
+    "elo": 1750,
+    "home_kit_color": "#CD2E3A"
+  },
+  "AUS": {
+    "name_en": "Australia",
+    "name_zh": "澳大利亚",
+    "fifa_ranking": 24,
+    "confederation": "AFC",
+    "coach": "Tony Popovic",
+    "captain": "Mathew Leckie",
+    "elo": 1730,
+    "home_kit_color": "#FFCD00"
+  },
+  "MAR": {
+    "name_en": "Morocco",
+    "name_zh": "摩洛哥",
+    "fifa_ranking": 12,
+    "confederation": "CAF",
+    "coach": "Walid Regragui",
+    "captain": "Achraf Hakimi",
+    "elo": 1870,
+    "home_kit_color": "#C1272D"
+  },
+  "SEN": {
+    "name_en": "Senegal",
+    "name_zh": "塞内加尔",
+    "fifa_ranking": 19,
+    "confederation": "CAF",
+    "coach": "Aliou Cissé",
+    "captain": "Kalidou Koulibaly",
+    "elo": 1790,
+    "home_kit_color": "#00853F"
+  }
+}

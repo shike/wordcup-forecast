@@ -1,0 +1,29 @@
+[
+  {"name": "Mike Maignan", "position": "GK", "number": 16, "age": 29, "club": "AC Milan", "caps": 22, "goals": 0, "rating": 8.1, "preferred_foot": "R", "height_cm": 191, "wikipedia_url": "https://en.wikipedia.org/wiki/Mike_Maignan"},
+  {"name": "Brice Samba", "position": "GK", "number": 1, "age": 30, "club": "Lens", "caps": 4, "goals": 0, "rating": 7.4, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Brice_Samba"},
+  {"name": "Alphonse Areola", "position": "GK", "number": 23, "age": 32, "club": "West Ham", "caps": 5, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 195, "wikipedia_url": "https://en.wikipedia.org/wiki/Alphonse_Areola"},
+
+  {"name": "Jules Koundé", "position": "RB", "number": 5, "age": 26, "club": "Barcelona", "caps": 43, "goals": 1, "rating": 8.2, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Jules_Kound%C3%A9"},
+  {"name": "William Saliba", "position": "CB", "number": 17, "age": 23, "club": "Arsenal", "caps": 17, "goals": 1, "rating": 8.3, "preferred_foot": "R", "height_cm": 193, "wikipedia_url": "https://en.wikipedia.org/wiki/William_Saliba"},
+  {"name": "Dayot Upamecano", "position": "CB", "number": 4, "age": 26, "club": "Bayern", "caps": 31, "goals": 2, "rating": 7.9, "preferred_foot": "R", "height_cm": 186, "wikipedia_url": "https://en.wikipedia.org/wiki/Dayot_Upamecano"},
+  {"name": "Ibrahima Konaté", "position": "CB", "number": 25, "age": 25, "club": "Liverpool", "caps": 16, "goals": 0, "rating": 7.9, "preferred_foot": "R", "height_cm": 194, "wikipedia_url": "https://en.wikipedia.org/wiki/Ibrahima_Konat%C3%A9"},
+  {"name": "Theo Hernández", "position": "LB", "number": 22, "age": 27, "club": "AC Milan", "caps": 33, "goals": 2, "rating": 8.1, "preferred_foot": "L", "height_cm": 184, "wikipedia_url": "https://en.wikipedia.org/wiki/Th%C3%A9o_Hern%C3%A1ndez"},
+  {"name": "Lucas Digne", "position": "LB", "number": 18, "age": 31, "club": "Aston Villa", "caps": 45, "goals": 0, "rating": 7.4, "preferred_foot": "L", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Lucas_Digne"},
+
+  {"name": "N'Golo Kanté", "position": "CDM", "number": 13, "age": 33, "club": "Al-Ittihad", "caps": 60, "goals": 2, "rating": 7.8, "preferred_foot": "R", "height_cm": 168, "wikipedia_url": "https://en.wikipedia.org/wiki/N%27Golo_Kant%C3%A9"},
+  {"name": "Aurélien Tchouaméni", "position": "CDM", "number": 8, "age": 25, "club": "Real Madrid", "caps": 38, "goals": 3, "rating": 8.2, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Aur%C3%A9lien_Tchouam%C3%A9ni"},
+  {"name": "Adrien Rabiot", "position": "CM", "number": 14, "age": 29, "club": "Marseille", "caps": 48, "goals": 4, "rating": 7.7, "preferred_foot": "L", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Adrien_Rabiot"},
+  {"name": "Eduardo Camavinga", "position": "CM", "number": 6, "age": 22, "club": "Real Madrid", "caps": 18, "goals": 0, "rating": 7.9, "preferred_foot": "L", "height_cm": 182, "wikipedia_url": "https://en.wikipedia.org/wiki/Eduardo_Camavinga"},
+
+  {"name": "Ousmane Dembélé", "position": "RW", "number": 11, "age": 27, "club": "PSG", "caps": 56, "goals": 6, "rating": 8.2, "preferred_foot": "L", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Ousmane_Demb%C3%A9l%C3%A9"},
+  {"name": "Kylian Mbappé", "position": "ST", "number": 10, "age": 26, "club": "Real Madrid", "caps": 86, "goals": 48, "rating": 9.1, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Kylian_Mbapp%C3%A9"},
+  {"name": "Bradley Barcola", "position": "LW", "number": 20, "age": 22, "club": "PSG", "caps": 11, "goals": 2, "rating": 7.6, "preferred_foot": "R", "height_cm": 186, "wikipedia_url": "https://en.wikipedia.org/wiki/Bradley_Barcola"},
+  {"name": "Randal Kolo Muani", "position": "ST", "number": 12, "age": 26, "club": "PSG", "caps": 22, "goals": 6, "rating": 7.6, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Randal_Kolo_Muani"},
+  {"name": "Marcus Thuram", "position": "ST", "number": 15, "age": 27, "club": "Inter", "caps": 22, "goals": 3, "rating": 7.9, "preferred_foot": "R", "height_cm": 192, "wikipedia_url": "https://en.wikipedia.org/wiki/Marcus_Thuram"},
+
+  {"name": "Youssouf Fofana", "position": "CM", "number": 19, "age": 25, "club": "AC Milan", "caps": 18, "goals": 0, "rating": 7.6, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Youssouf_Fofana_(footballer)"},
+  {"name": "Warren Zaïre-Emery", "position": "CM", "number": 24, "age": 19, "club": "PSG", "caps": 6, "goals": 1, "rating": 7.6, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Warren_Za%C3%AFre-Emery"},
+  {"name": "Jonathan Clauss", "position": "RB", "number": 2, "age": 32, "club": "Marseille", "caps": 13, "goals": 1, "rating": 7.4, "preferred_foot": "R", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Jonathan_Clauss"},
+  {"name": "Kingsley Coman", "position": "LW", "number": 7, "age": 28, "club": "Bayern", "caps": 56, "goals": 8, "rating": 7.7, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Kingsley_Coman"},
+  {"name": "Moussa Diaby", "position": "RW", "number": 21, "age": 25, "club": "Aston Villa", "caps": 11, "goals": 2, "rating": 7.5, "preferred_foot": "L", "height_cm": 170, "wikipedia_url": "https://en.wikipedia.org/wiki/Moussa_Diaby"}
+]

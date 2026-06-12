@@ -1,0 +1,28 @@
+[
+  {"name": "Jordan Pickford", "position": "GK", "number": 1, "age": 30, "club": "Everton", "caps": 70, "goals": 0, "rating": 7.8, "preferred_foot": "L", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Jordan_Pickford"},
+  {"name": "Aaron Ramsdale", "position": "GK", "number": 13, "age": 26, "club": "Southampton", "caps": 4, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Aaron_Ramsdale"},
+  {"name": "Dean Henderson", "position": "GK", "number": 23, "age": 27, "club": "Crystal Palace", "caps": 1, "goals": 0, "rating": 7.0, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Dean_Henderson"},
+
+  {"name": "Trent Alexander-Arnold", "position": "RB", "number": 8, "age": 26, "club": "Real Madrid", "caps": 35, "goals": 4, "rating": 8.2, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Trent_Alexander-Arnold"},
+  {"name": "John Stones", "position": "CB", "number": 5, "age": 30, "club": "Man City", "caps": 83, "goals": 3, "rating": 7.9, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/John_Stones"},
+  {"name": "Harry Maguire", "position": "CB", "number": 6, "age": 31, "club": "Man United", "caps": 64, "goals": 7, "rating": 7.4, "preferred_foot": "R", "height_cm": 194, "wikipedia_url": "https://en.wikipedia.org/wiki/Harry_Maguire"},
+  {"name": "Marc Guéhi", "position": "CB", "number": 3, "age": 24, "club": "Crystal Palace", "caps": 21, "goals": 1, "rating": 7.7, "preferred_foot": "L", "height_cm": 182, "wikipedia_url": "https://en.wikipedia.org/wiki/Marc_Gu%C3%A9hi"},
+  {"name": "Luke Shaw", "position": "LB", "number": 4, "age": 29, "club": "Man United", "caps": 31, "goals": 2, "rating": 7.5, "preferred_foot": "L", "height_cm": 181, "wikipedia_url": "https://en.wikipedia.org/wiki/Luke_Shaw"},
+
+  {"name": "Declan Rice", "position": "CDM", "number": 17, "age": 26, "club": "Arsenal", "caps": 65, "goals": 5, "rating": 8.4, "preferred_foot": "R", "height_cm": 185, "wikipedia_url": "https://en.wikipedia.org/wiki/Declan_Rice"},
+  {"name": "Jude Bellingham", "position": "CM", "number": 10, "age": 21, "club": "Real Madrid", "caps": 42, "goals": 6, "rating": 8.7, "preferred_foot": "R", "height_cm": 186, "wikipedia_url": "https://en.wikipedia.org/wiki/Jude_Bellingham"},
+  {"name": "Phil Foden", "position": "CM", "number": 11, "age": 24, "club": "Man City", "caps": 40, "goals": 4, "rating": 8.1, "preferred_foot": "L", "height_cm": 171, "wikipedia_url": "https://en.wikipedia.org/wiki/Phil_Foden"},
+  {"name": "Conor Gallagher", "position": "CM", "number": 14, "age": 24, "club": "Atletico Madrid", "caps": 14, "goals": 0, "rating": 7.4, "preferred_foot": "R", "height_cm": 182, "wikipedia_url": "https://en.wikipedia.org/wiki/Conor_Gallagher"},
+
+  {"name": "Bukayo Saka", "position": "RW", "number": 7, "age": 23, "club": "Arsenal", "caps": 42, "goals": 13, "rating": 8.3, "preferred_foot": "L", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Bukayo_Saka"},
+  {"name": "Harry Kane", "position": "ST", "number": 9, "age": 31, "club": "Bayern", "caps": 105, "goals": 71, "rating": 8.8, "preferred_foot": "R", "height_cm": 188, "wikipedia_url": "https://en.wikipedia.org/wiki/Harry_Kane"},
+  {"name": "Cole Palmer", "position": "CAM", "number": 20, "age": 22, "club": "Chelsea", "caps": 18, "goals": 5, "rating": 8.2, "preferred_foot": "L", "height_cm": 189, "wikipedia_url": "https://en.wikipedia.org/wiki/Cole_Palmer"},
+  {"name": "Anthony Gordon", "position": "LW", "number": 19, "age": 24, "club": "Newcastle", "caps": 12, "goals": 2, "rating": 7.7, "preferred_foot": "R", "height_cm": 184, "wikipedia_url": "https://en.wikipedia.org/wiki/Anthony_Gordon"},
+  {"name": "Ollie Watkins", "position": "ST", "number": 18, "age": 28, "club": "Aston Villa", "caps": 17, "goals": 4, "rating": 7.7, "preferred_foot": "R", "height_cm": 180, "wikipedia_url": "https://en.wikipedia.org/wiki/Ollie_Watkins"},
+
+  {"name": "Kobbie Mainoo", "position": "CM", "number": 16, "age": 19, "club": "Man United", "caps": 6, "goals": 0, "rating": 7.4, "preferred_foot": "R", "height_cm": 175, "wikipedia_url": "https://en.wikipedia.org/wiki/Kobbie_Mainoo"},
+  {"name": "Ezri Konsa", "position": "CB", "number": 2, "age": 27, "club": "Aston Villa", "caps": 6, "goals": 0, "rating": 7.3, "preferred_foot": "R", "height_cm": 183, "wikipedia_url": "https://en.wikipedia.org/wiki/Ezri_Konsa"},
+  {"name": "Tino Livramento", "position": "RB", "number": 12, "age": 22, "club": "Newcastle", "caps": 1, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 178, "wikipedia_url": "https://en.wikipedia.org/wiki/Tino_Livramento"},
+  {"name": "Ivan Toney", "position": "ST", "number": 21, "age": 29, "club": "Al-Ahli", "caps": 6, "goals": 1, "rating": 7.5, "preferred_foot": "R", "height_cm": 179, "wikipedia_url": "https://en.wikipedia.org/wiki/Ivan_Toney"},
+  {"name": "Morgan Rogers", "position": "CM", "number": 15, "age": 22, "club": "Aston Villa", "caps": 4, "goals": 0, "rating": 7.2, "preferred_foot": "R", "height_cm": 187, "wikipedia_url": "https://en.wikipedia.org/wiki/Morgan_Rogers"}
+]
