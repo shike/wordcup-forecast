@@ -141,7 +141,7 @@ def render_player_card(player: Player, size: tuple[int, int] = (320, 440), kit_c
     foot = f"#{player.number}  ·  {player.club or '—'}"
     draw.text((size[0] // 2, size[1] - 20), foot, fill="#9AB0C8", font=f_foot, anchor="mm")
 
-    out = Path(f"/tmp/player_card_{player.id}.png")
+    out = Path(f"/tmp/球员卡_{player.id}.png")
     img.save(out, "PNG")
     return out
 

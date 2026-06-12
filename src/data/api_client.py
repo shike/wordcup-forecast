@@ -20,7 +20,7 @@ HEADERS_TEMPLATE = {"X-Auth-Token": "{token}"}
 
 
 def _cache_path(name: str) -> Path:
-    return config.api_cache / f"fdata_{name}.json"
+    return config.api_cache / f"football_data_{name}.json"
 
 
 def _get(endpoint: str, params: dict | None = None) -> dict[str, Any] | None:

@@ -24,8 +24,8 @@ HEADERS = {"User-Agent": "wordcup-forecast/1.0 (contact: example@example.com)"}
 
 
 def _summary_cache_path(name: str) -> Path:
-    safe = re.sub(r"[^a-z0-9]+", "_", name.lower())[:60]
-    return config.api_cache / f"wiki_summary_{safe}.json"
+    safe = re.sub(r"[^a-z0-9一-鿿]+", "_", name.lower())[:60]
+    return config.api_cache / f"球员摘要_{safe}.json"
 
 
 def fetch_player_summary(name: str) -> dict[str, Any] | None:

@@ -34,15 +34,19 @@ ENV/
 *.swo
 .DS_Store
 
-# Logs
+# 日志
 *.log
-output/predict.log
+输出/预测.log
 
-# Generated cache (Wikipedia summaries, player photos)
-cache/
+# 缓存（球员照片、API 响应、Wikipedia 摘要）
+缓存/
 
-# Generated PPTs (kept out of git, can be regenerated)
-output/*.pptx
+# 生成的 PPT（可重新生成，不入库）
+输出/*.pptx
+
+# 临时图表 / 球员卡
+/tmp/世界杯预测_*.png
+/tmp/球员卡_*.png
 
 # Environment
 .env

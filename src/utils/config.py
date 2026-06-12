@@ -13,12 +13,12 @@ load_dotenv(PROJECT_ROOT / ".env")
 class Config:
     football_data_api_key: str = os.getenv("FOOTBALL_DATA_API_KEY", "")
     offline_mode: bool = os.getenv("OFFLINE_MODE", "false").lower() == "true"
-    output_dir: Path = PROJECT_ROOT / os.getenv("OUTPUT_DIR", "./output")
-    cache_dir: Path = PROJECT_ROOT / os.getenv("CACHE_DIR", "./cache")
+    output_dir: Path = PROJECT_ROOT / os.getenv("OUTPUT_DIR", "./输出")
+    cache_dir: Path = PROJECT_ROOT / os.getenv("CACHE_DIR", "./缓存")
     default_lang: str = os.getenv("DEFAULT_LANG", "bilingual")
 
-    player_photo_cache: Path = PROJECT_ROOT / "cache" / "players"
-    api_cache: Path = PROJECT_ROOT / "cache" / "api"
+    player_photo_cache: Path = PROJECT_ROOT / "缓存" / "球员照片"
+    api_cache: Path = PROJECT_ROOT / "缓存" / "API响应"
     squad_data_dir: Path = PROJECT_ROOT / "data" / "squads"
     assets_dir: Path = PROJECT_ROOT / "assets"
     team_logos_dir: Path = PROJECT_ROOT / "assets" / "team_logos"

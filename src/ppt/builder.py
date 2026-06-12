@@ -70,7 +70,7 @@ from src.utils.models import (
 from src.data.wikipedia_client import batch_augment_squad
 
 
-CHART_DIR = Path("/tmp/wc_charts")
+CHART_DIR = Path("/tmp/世界杯预测_图表缓存")
 CHART_DIR.mkdir(exist_ok=True)
 
 
@@ -851,11 +851,11 @@ def build_ppt(result: PredictionResult, lang: str = "bilingual", output_path: Pa
     _page_appendix(prs, result)             # 17
 
     if output_path is None:
-        team_a = result.match.team_a.name_en
-        team_b = result.match.team_b.name_en
+        team_a_zh = result.match.team_a.name_zh
+        team_b_zh = result.match.team_b.name_zh
         date = result.match.match_date
-        output_path = config.output_dir / f"{team_a}_vs_{team_b}_{date}.pptx"
+        output_path = config.output_dir / f"{team_a_zh}_对阵_{team_b_zh}_{date}.pptx"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prs.save(str(output_path))
-    logger.success(f"PPT saved to {output_path}")
+    logger.success(f"PPT 已保存：{output_path}")
     return output_path

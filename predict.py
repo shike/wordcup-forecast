@@ -15,53 +15,52 @@ from src.utils.config import config
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="wordcup-forecast",
-        description="World Cup match prediction with full PPT report",
+        description="世界杯比赛预测 · 完整 PPT 报告生成器",
     )
-    parser.add_argument("--team-a", help="Team A name (English or Chinese) or code (e.g. BRA)")
-    parser.add_argument("--team-b", help="Team B name (English or Chinese) or code (e.g. ARG)")
+    parser.add_argument("--team-a", help="主队名称（中文 / 英文 / 三字代码，如 BRA）")
+    parser.add_argument("--team-b", help="客队名称（中文 / 英文 / 三字代码，如 ARG）")
     parser.add_argument(
-        "--match-date", default=datetime.now().strftime("%Y-%m-%d"), help="Match date YYYY-MM-DD"
+        "--match-date", default=datetime.now().strftime("%Y-%m-%d"), help="比赛日期 YYYY-MM-DD"
     )
     parser.add_argument(
         "--stage",
         default="group",
         choices=["group", "round_of_16", "quarterfinal", "semifinal", "final", "third_place"],
     )
-    parser.add_argument("--venue", default="TBD", help="Stadium / venue")
+    parser.add_argument("--venue", default="TBD", help="比赛场地")
     parser.add_argument(
-        "--lang", default=config.default_lang, choices=["zh", "en", "bilingual"]
+        "--lang", default=config.default_lang, choices=["zh", "en", "bilingual"],
+        help="PPT 语言：zh 中文 / en 英文 / bilingual 中英双语"
     )
     parser.add_argument(
-        "--dry-run", action="store_true", help="Compute prediction but skip PPT generation"
+        "--dry-run", action="store_true", help="只计算预测，不生成 PPT"
     )
-    parser.add_argument("--output", help="Output PPTX path")
-    parser.add_argument("--simulations", type=int, default=10_000, help="Monte Carlo sim count")
-    parser.add_argument("--list-teams", action="store_true", help="List known teams and exit")
+    parser.add_argument("--output", help="PPT 输出路径（可选）")
+    parser.add_argument("--simulations", type=int, default=10_000, help="蒙特卡洛模拟次数")
+    parser.add_argument("--list-teams", action="store_true", help="列出已知球队并退出")
     parser.add_argument(
         "--fetch-fixtures",
         nargs="?",
         const="today",
         default=None,
-        metavar="DATE",
-        help="Fetch and list soccer fixtures for DATE (YYYY-MM-DD) or 'today' (default: today). "
-             "Add --all to see every match.",
+        metavar="日期",
+        help="拉取指定日期的足球赛程（YYYY-MM-DD 或 today），并显示列表"
     )
     parser.add_argument(
         "--all-fixtures",
         action="store_true",
-        help="When using --fetch-fixtures, show all matches (not just top leagues).",
+        help="配合 --fetch-fixtures，显示所有比赛（不仅顶级联赛）"
     )
     parser.add_argument(
         "--predict-fixture",
         type=int,
         metavar="N",
-        help="Predict the Nth fixture from a previous --fetch-fixtures call. "
-             "Uses the cached fixture list (most recent fetch).",
+        help="预测赛程列表中第 N 场比赛（先用 --fetch-fixtures 拉取）"
     )
     parser.add_argument(
         "--fixture-date",
         default=None,
-        help="Date for --predict-fixture in YYYY-MM-DD (default: last fetched).",
+        help="配合 --predict-fixture，指定赛程日期 YYYY-MM-DD"
     )
     return parser.parse_args()
 
@@ -189,7 +188,7 @@ def main() -> None:
         from src.ppt.builder import build_ppt
         output_path = Path(args.output) if args.output else None
         ppt_path = build_ppt(result, lang=args.lang, output_path=output_path)
-        logger.success(f"PPT written: {ppt_path}")
+        logger.success(f"PPT 已生成：{ppt_path}")
         return
 
     if not args.team_a or not args.team_b:

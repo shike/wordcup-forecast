@@ -139,7 +139,7 @@ class Fixture:
 
 
 def _cache_path(date_str: str) -> Path:
-    return config.api_cache / f"fixtures_espn_{date_str}.json"
+    return config.api_cache / f"赛程_espn_{date_str}.json"
 
 
 def fetch_fixtures(date_str: str | None = None) -> list[Fixture]:
