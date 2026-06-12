@@ -101,6 +101,19 @@ def draw_pitch_with_lineup(lineup: Lineup, save_path: Path, kit_color: str = "#F
         if i % 2 == 0:
             ax.add_patch(plt.Rectangle((0.04, y0), 0.92, 0.10, facecolor="#15431A", edgecolor="none", alpha=0.6))
 
+    # Draw formation lines connecting players in the same horizontal "line" (#8).
+    # Group coordinates by y-band, then connect sorted x's within each band.
+    bands: dict[float, list[tuple[float, float]]] = {}
+    for (x, y) in coords:
+        bands.setdefault(round(y, 2), []).append((x, y))
+    for band_pts in bands.values():
+        if len(band_pts) >= 2:
+            band_pts.sort()
+            xs = [p[0] for p in band_pts]
+            ys = [p[1] for p in band_pts]
+            ax.plot([xs[0], xs[-1]], [ys[0], ys[-1]],
+                    color=kit_color, linewidth=1.2, alpha=0.5, zorder=2.5)
+
     # Player dots
     for (x, y), slot, player in zip(coords, positions, lineup.players):
         # dot
