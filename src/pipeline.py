@@ -104,7 +104,9 @@ def run_prediction(
 
     logger.info("Running ELO + Poisson + ML…")
     elo_p = predict_elo(team_a, team_b, neutral=True)
-    poi_p, (lam_a, lam_b), matrix = predict_poisson(team_a, team_b, stats_a, stats_b)
+    # Pass ELO to predict_poisson so lambdas reflect the actual quality gap
+    poi_p, (lam_a, lam_b), matrix = predict_poisson(team_a, team_b, stats_a, stats_b,
+                                                       elo_a=team_a.elo, elo_b=team_b.elo)
     ml_p = _ml_probs(team_a, team_b, stats_a, stats_b, match)
 
     # Apply qualitative adjustments

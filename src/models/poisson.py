@@ -14,14 +14,29 @@ def _poisson_pmf(lam: float, k: int) -> float:
     return (lam**k) * exp(-lam) / factorial(k)
 
 
-def expected_goals(team_stats: TeamStats, opp_stats: TeamStats) -> tuple[float, float]:
-    """Estimate lambdas using a simple attack/defence decomposition."""
-    league_avg = 1.35  # international average goals per game
-    attack_a = team_stats.goals_per_game / league_avg
-    defence_a = opp_stats.conceded_per_game / league_avg
-    lambda_a = max(0.3, attack_a * defence_a * league_avg)
-    lambda_b = max(0.3, (opp_stats.goals_per_game / league_avg) * (team_stats.conceded_per_game / league_avg) * league_avg)
-    return lambda_a, lambda_b
+def expected_goals(team_stats: TeamStats, opp_stats: TeamStats,
+                 elo_a: float = 1800, elo_b: float = 1800) -> tuple[float, float]:
+    """Estimate lambdas using ELO differential + team stats.
+
+    Uses ELO-based probability to scale lambdas asymmetrically so that
+    strong vs weak matchups produce visibly different score distributions
+    (and the modal score reflects the favourite rather than always being
+    1-1).
+    """
+    elo_diff = (elo_a - elo_b) / 400.0
+    expected = 1.0 / (1.0 + 10 ** (-elo_diff))  # ELO win-probability
+    base = 1.25
+    # At elo_diff=0 (even), both get 1.25.  At elo_diff=200 (~70% fav),
+    # favourite gets 1.6, underdog 0.9.
+    lambda_a = base * (0.4 + 0.8 * expected)
+    lambda_b = base * (0.4 + 0.8 * (1.0 - expected))
+    # Modulate by team stats (avg_player_rating) so a statistically better
+    # team gets a slight bump.
+    bump_a = 1.0 + (team_stats.avg_player_rating - 7.0) * 0.05
+    bump_b = 1.0 + (opp_stats.avg_player_rating - 7.0) * 0.05
+    lambda_a *= max(0.7, min(1.4, bump_a))
+    lambda_b *= max(0.7, min(1.4, bump_b))
+    return max(0.3, lambda_a), max(0.3, lambda_b)
 
 
 def score_probability_matrix(lambda_a: float, lambda_b: float, max_goals: int = 7) -> np.ndarray:
@@ -74,10 +89,11 @@ def dixon_coles_correction(
 
 
 def predict_poisson(
-    team_a: Team, team_b: Team, stats_a: TeamStats, stats_b: TeamStats
+    team_a: Team, team_b: Team, stats_a: TeamStats, stats_b: TeamStats,
+    elo_a: float = 1800, elo_b: float = 1800,
 ) -> tuple[tuple[float, float, float], tuple[float, float], np.ndarray]:
     """Full Poisson pipeline. Returns (probs, expected_goals, score_matrix)."""
-    lambda_a, lambda_b = expected_goals(stats_a, stats_b)
+    lambda_a, lambda_b = expected_goals(stats_a, stats_b, elo_a=elo_a, elo_b=elo_b)
     matrix = score_probability_matrix(lambda_a, lambda_b)
     matrix = dixon_coles_correction(matrix, lambda_a, lambda_b)
     probs = match_outcome_probabilities(matrix)
