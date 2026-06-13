@@ -310,5 +310,29 @@
     "captain_zh": "安迪·罗伯逊",
     "elo": 1640,
     "home_kit_color": "#003078"
+  },
+  "AUS": {
+    "name_en": "Australia",
+    "name_zh": "澳大利亚",
+    "fifa_ranking": 24,
+    "confederation": "AFC",
+    "coach": "Tony Popovic",
+    "coach_zh": "托尼·波波维奇",
+    "captain": "Mathew Leckie",
+    "captain_zh": "马修·莱基",
+    "elo": 1730,
+    "home_kit_color": "#FFCD00"
+  },
+  "TUR": {
+    "name_en": "Türkiye",
+    "name_zh": "土耳其",
+    "fifa_ranking": 25,
+    "confederation": "UEFA",
+    "coach": "Vincenzo Montella",
+    "coach_zh": "文森佐·蒙特拉",
+    "captain": "Hakan Çalhanoğlu",
+    "captain_zh": "哈坎·恰尔汗奥卢",
+    "elo": 1720,
+    "home_kit_color": "#E30A17"
   }
 }

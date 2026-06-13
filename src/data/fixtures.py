@@ -142,14 +142,31 @@ def _cache_path(date_str: str) -> Path:
     return config.api_cache / f"赛程_espn_{date_str}.json"
 
 
-def fetch_fixtures(date_str: str | None = None) -> list[Fixture]:
-    """Fetch soccer fixtures for a given YYYY-MM-DD date (default: today UTC).
+def fetch_fixtures(date_str: str | None = None,
+                   user_tz_offset_hours: int = 8) -> list[Fixture]:
+    """Fetch soccer fixtures for a given YYYY-MM-DD date (default: today in user's tz).
 
+    If `date_str` is None, computes "today" from the user's timezone so a
+    10pm Beijing fixture on a UTC date boundary is still caught.
     Aggregates all configured league slugs and de-duplicates by event id.
-    Results are cached for 1 hour.
+    Results are cached for 1 hour per UTC date.
     """
-    if date_str is None:
-        date_str = datetime.utcnow().strftime("%Y-%m-%d")
+    if date_str is None or date_str in ("today", "tonight", "now"):
+        now_utc = datetime.utcnow()
+        user_now = now_utc + timedelta(hours=user_tz_offset_hours)
+        date_str = user_now.strftime("%Y-%m-%d")
+
+    # Fetch both the user's date AND the adjacent UTC date so fixtures that
+    # straddle the day boundary (e.g. 23:00 local = 15:00 UTC next day)
+    # are not missed. We then de-dup by event id.
+    if date_str:
+        try:
+            d = datetime.strptime(date_str, "%Y-%m-%d")
+            extra = (d + timedelta(days=1)).strftime("%Y-%m-%d")
+        except Exception:
+            extra = None
+    else:
+        extra = None
 
     cache = _cache_path(date_str)
     if cache.exists():
@@ -161,24 +178,37 @@ def fetch_fixtures(date_str: str | None = None) -> list[Fixture]:
             except Exception:
                 pass
 
-    date_compact = date_str.replace("-", "")
+    seen_ids: set[str] = set()
     fixtures: list[Fixture] = []
-    for slug, name in LEAGUE_SLUGS:
-        url = f"{ESPN_BASE}/{slug}/scoreboard"
-        try:
-            resp = requests.get(url, params={"dates": date_compact}, timeout=8)
-            if resp.status_code != 200:
-                continue
-            data = resp.json()
-            for e in data.get("events", []):
-                fixtures.append(_espn_to_fixture(e, league_name=name))
-        except Exception as e:
-            logger.debug(f"ESPN {slug} failed: {e}")
+    for d in [date_str, extra]:
+        if not d:
+            continue
+        date_compact = d.replace("-", "")
+        for slug, name in LEAGUE_SLUGS:
+            url = f"{ESPN_BASE}/{slug}/scoreboard"
+            try:
+                resp = requests.get(url, params={"dates": date_compact}, timeout=8)
+                if resp.status_code != 200:
+                    continue
+                data = resp.json()
+                for e in data.get("events", []):
+                    fid = str(e.get("id", ""))
+                    if fid in seen_ids:
+                        continue
+                    seen_ids.add(fid)
+                    fixtures.append(_espn_to_fixture(e, league_name=name))
+            except Exception as e:
+                logger.debug(f"ESPN {slug} failed: {e}")
 
-    # Fallback: if nothing came back, try TheSportsDB
+    # Fallback: if nothing came back, try TheSportsDB (wrapped in try/except
+    # since the public test key is rate-limited and often returns non-JSON)
     if not fixtures:
         logger.info("ESPN returned 0 fixtures, falling back to TheSportsDB")
-        fixtures = _thesportsdb_fallback(date_str)
+        try:
+            fixtures = _thesportsdb_fallback(date_str)
+        except Exception as e:
+            logger.warning(f"TheSportsDB fallback failed: {e}")
+            fixtures = []
 
     # Cache and return
     cache.write_text(
