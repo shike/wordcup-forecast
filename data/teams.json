@@ -262,5 +262,53 @@
     "captain_zh": "卡利杜·库利巴利",
     "elo": 1790,
     "home_kit_color": "#00853F"
+  },
+  "QAT": {
+    "name_en": "Qatar",
+    "name_zh": "卡塔尔",
+    "fifa_ranking": 35,
+    "confederation": "AFC",
+    "coach": "Julen Lopetegui",
+    "coach_zh": "胡伦·洛佩特吉",
+    "captain": "Akram Afif",
+    "captain_zh": "阿克拉姆·阿费夫",
+    "elo": 1680,
+    "home_kit_color": "#660D37"
+  },
+  "SUI": {
+    "name_en": "Switzerland",
+    "name_zh": "瑞士",
+    "fifa_ranking": 21,
+    "confederation": "UEFA",
+    "coach": "Murat Yakin",
+    "coach_zh": "穆拉特·雅金",
+    "captain": "Granit Xhaka",
+    "captain_zh": "格拉尼特·扎卡",
+    "elo": 1760,
+    "home_kit_color": "#D52B1E"
+  },
+  "HAI": {
+    "name_en": "Haiti",
+    "name_zh": "海地",
+    "fifa_ranking": 80,
+    "confederation": "CONCACAF",
+    "coach": "Sebastien Caboux",
+    "coach_zh": "塞巴斯蒂安·卡布",
+    "captain": "Johny Placide",
+    "captain_zh": "约翰尼·普拉西德",
+    "elo": 1480,
+    "home_kit_color": "#1E3A8A"
+  },
+  "SCO": {
+    "name_en": "Scotland",
+    "name_zh": "苏格兰",
+    "fifa_ranking": 41,
+    "confederation": "UEFA",
+    "coach": "Steve Clarke",
+    "coach_zh": "史蒂�·克拉克",
+    "captain": "Andy Robertson",
+    "captain_zh": "安迪·罗伯逊",
+    "elo": 1640,
+    "home_kit_color": "#003078"
   }
 }
