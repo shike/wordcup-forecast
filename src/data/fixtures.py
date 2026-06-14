@@ -4,9 +4,8 @@ This module bypasses the Claude Code WebSearch/WebFetch tool layer (which
 is restricted in some environments) by calling HTTP endpoints directly
 via the ``requests`` library already a project dependency.
 
-Primary source: ESPN public scoreboard API (free, no key, comprehensive
+Data source: ESPN public scoreboard API (free, no key, comprehensive
 World Cup / top-league coverage).
-Fallback: TheSportsDB public test key (free, no key, partial coverage).
 """
 from __future__ import annotations
 
@@ -20,11 +19,11 @@ import requests
 from loguru import logger
 
 from src.utils.config import config
+from src.data.scrapers import dongqiudi as dqd_api
+from src.data.scrapers import jisu as jisu_api
 
 
 ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer"
-THESPORTSDB_BASE = "https://www.thesportsdb.com/api/v1/json"
-THESPORTSDB_KEY = "3"  # public test key
 
 # Beijing time (UTC+8) — default display timezone
 BEIJING_TZ = timezone(timedelta(hours=8))
@@ -126,6 +125,9 @@ class Fixture:
     home_badge: str | None
     away_badge: str | None
     league_badge: str | None
+    # Optional Chinese names populated when JisuAPI supplements ESPN data.
+    home_team_zh: str | None = None
+    away_team_zh: str | None = None
 
     def short(self) -> str:
         bj = to_beijing(self.kickoff_utc)
@@ -135,7 +137,9 @@ class Fixture:
             time_str = f"{d} {t} (北京时间)"
         else:
             time_str = "TBD"
-        return f"{time_str}  {self.home_team} vs {self.away_team}  ({self.league})"
+        home = self.home_team_zh or self.home_team
+        away = self.away_team_zh or self.away_team
+        return f"{time_str}  {home} vs {away}  ({self.league})"
 
 
 def _cache_path(date_str: str) -> Path:
@@ -200,15 +204,12 @@ def fetch_fixtures(date_str: str | None = None,
             except Exception as e:
                 logger.debug(f"ESPN {slug} failed: {e}")
 
-    # Fallback: if nothing came back, try TheSportsDB (wrapped in try/except
-    # since the public test key is rate-limited and often returns non-JSON)
     if not fixtures:
-        logger.info("ESPN returned 0 fixtures, falling back to TheSportsDB")
-        try:
-            fixtures = _thesportsdb_fallback(date_str)
-        except Exception as e:
-            logger.warning(f"TheSportsDB fallback failed: {e}")
-            fixtures = []
+        logger.info(f"No fixtures found for {date_str} from any configured ESPN league")
+
+    # Supplement ESPN data with free Dongqiudi Chinese fixtures, then JisuAPI if configured.
+    fixtures = _enrich_with_dongqiudi(fixtures)
+    fixtures = _enrich_with_jisu(fixtures)
 
     # Cache and return
     cache.write_text(
@@ -244,38 +245,271 @@ def _espn_to_fixture(e: dict[str, Any], league_name: str) -> Fixture:
     )
 
 
-def _thesportsdb_fallback(date_str: str) -> list[Fixture]:
-    url = f"{THESPORTSDB_BASE}/{THESPORTSDB_KEY}/eventsday.php"
-    try:
-        resp = requests.get(url, params={"d": date_str, "s": "Soccer"}, timeout=8)
-        resp.raise_for_status()
-    except Exception as e:
-        logger.warning(f"TheSportsDB fallback failed: {e}")
-        return []
-    events = resp.json().get("events") or []
-    return [_thesportsdb_to_fixture(e) for e in events]
-
-
-def _thesportsdb_to_fixture(e: dict[str, Any]) -> Fixture:
-    home = e.get("strHomeTeam", "TBD")
-    away = e.get("strAwayTeam", "TBD")
-    timestamp = e.get("strTimestamp", "")
+def _jisu_to_fixture(jf: jisu_api.JisuFixture) -> Fixture:
+    """Convert a JisuAPI fixture into the project's Fixture format."""
     return Fixture(
-        fixture_id=str(e.get("idEvent", "")),
-        league=e.get("strLeague", "Unknown"),
-        country=e.get("strCountry"),
-        round=str(e.get("intRound", "")) if e.get("intRound") else None,
-        home_team=home,
-        away_team=away,
-        home_code=_name_to_code(home),
-        away_code=_name_to_code(away),
-        venue=e.get("strVenue"),
-        kickoff_utc=timestamp,
-        status=e.get("strStatus", "NS"),
-        home_badge=e.get("strHomeTeamBadge"),
-        away_badge=e.get("strAwayTeamBadge"),
-        league_badge=e.get("strLeagueBadge"),
+        fixture_id=jf.fixture_id,
+        league=jf.league,
+        country=None,
+        round=jf.round_text,
+        home_team=jf.home_team,
+        away_team=jf.away_team,
+        home_code=_name_to_code(jf.home_team),
+        away_code=_name_to_code(jf.away_team),
+        venue=jf.venue,
+        kickoff_utc=jf.kickoff_utc,
+        status=jf.status,
+        home_badge=None,
+        away_badge=None,
+        league_badge=None,
+        home_team_zh=jf.home_team_zh,
+        away_team_zh=jf.away_team_zh,
     )
+
+
+def _dongqiudi_to_fixture(dm: dqd_api.DongqiudiMatch) -> Fixture:
+    """Convert a Dongqiudi match into the project's Fixture format."""
+    kickoff_utc = ""
+    if dm.start_play:
+        try:
+            bj = datetime.strptime(dm.start_play, "%Y-%m-%d %H:%M:%S")
+            bj = bj.replace(tzinfo=BEIJING_TZ)
+            kickoff_utc = bj.astimezone(timezone.utc).isoformat()
+        except ValueError:
+            kickoff_utc = ""
+
+    status_map = {
+        "Fixture": "Scheduled",
+        "Played": "Final",
+    }
+    status = status_map.get(dm.status, dm.status)
+
+    return Fixture(
+        fixture_id=dm.match_id,
+        league=dm.competition_name,
+        country=None,
+        round=dm.round_name or None,
+        home_team=dm.team_a_name_zh,
+        away_team=dm.team_b_name_zh,
+        home_code=_name_to_code(dm.team_a_name_zh),
+        away_code=_name_to_code(dm.team_b_name_zh),
+        venue=dm.venue,
+        kickoff_utc=kickoff_utc,
+        status=status,
+        home_badge=dm.team_a_logo,
+        away_badge=dm.team_b_logo,
+        league_badge=None,
+        home_team_zh=dm.team_a_name_zh,
+        away_team_zh=dm.team_b_name_zh,
+    )
+
+
+def _enrich_with_dongqiudi(fixtures: list[Fixture]) -> list[Fixture]:
+    """Add Chinese team names and back-fill missing fixtures from Dongqiudi."""
+    try:
+        # Dongqiudi's important endpoint returns the richest future fixture set
+        # when queried from the current day. Querying from yesterday returns
+        # only a handful of recent results.
+        start = (datetime.now(timezone.utc) + timedelta(hours=8)).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        dqd_matches = dqd_api.fetch_important_matches(start=start)
+    except Exception as exc:
+        logger.debug(f"Dongqiudi enrichment skipped: {exc}")
+        return fixtures
+
+    if not dqd_matches:
+        return fixtures
+
+    def _kickoff_dt(iso: str) -> datetime | None:
+        try:
+            return datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        except Exception:
+            return None
+
+    # Index Dongqiudi matches by match_id and by kickoff time.
+    by_id: dict[str, dqd_api.DongqiudiMatch] = {dm.match_id: dm for dm in dqd_matches}
+    by_kickoff: list[tuple[datetime, dqd_api.DongqiudiMatch]] = []
+    for dm in dqd_matches:
+        dt = _kickoff_dt(_dongqiudi_to_fixture(dm).kickoff_utc)
+        if dt:
+            by_kickoff.append((dt, dm))
+
+    # Pre-compute the Chinese→code mapping once so we don't rely on
+    # _name_to_code returning the Chinese string verbatim (which would match
+    # every ESPN fixture starting with the same letter).
+    zh_to_code = _zh_team_name_to_code()
+
+    def _find_match(f: Fixture) -> dqd_api.DongqiudiMatch | None:
+        # Prefer exact ID match.
+        dm = by_id.get(f.fixture_id)
+        if dm:
+            return dm
+
+        # Fallback: match by team identity. We translate the Dongqiudi Chinese
+        # team names to project 3-letter codes, then compare with the ESPN
+        # 3-letter codes. This avoids the brittle substring/startswith logic.
+        f_home_code = (f.home_code or "").upper()
+        f_away_code = (f.away_code or "").upper()
+        if not f_home_code or not f_away_code:
+            return None
+        if f_home_code == f_away_code:
+            return None
+
+        for dm in dqd_matches:
+            dqd_home_code = zh_to_code.get(dm.team_a_name_zh, "")
+            dqd_away_code = zh_to_code.get(dm.team_b_name_zh, "")
+            if dqd_home_code == f_home_code and dqd_away_code == f_away_code:
+                return dm
+            # Swap (Dongqiudi may list teams in either order vs. ESPN).
+            if dqd_home_code == f_away_code and dqd_away_code == f_home_code:
+                return dm
+        return None
+
+    seen_ids: set[str] = {f.fixture_id for f in fixtures}
+    enriched: list[Fixture] = []
+    for f in fixtures:
+        dm = _find_match(f)
+        if dm:
+            f = Fixture(
+                fixture_id=f.fixture_id,
+                league=f.league,
+                country=f.country,
+                round=f.round,
+                home_team=f.home_team,
+                away_team=f.away_team,
+                home_code=f.home_code,
+                away_code=f.away_code,
+                venue=f.venue or dm.venue,
+                kickoff_utc=f.kickoff_utc,
+                status=f.status,
+                home_badge=f.home_badge,
+                away_badge=f.away_badge,
+                league_badge=f.league_badge,
+                home_team_zh=dm.team_a_name_zh,
+                away_team_zh=dm.team_b_name_zh,
+            )
+        enriched.append(f)
+
+    # Append Dongqiudi-only World Cup fixtures that ESPN missed.
+    for dm in dqd_matches:
+        if dm.match_id in seen_ids:
+            continue
+        if "世界杯" not in dm.competition_name:
+            continue
+        enriched.append(_dongqiudi_to_fixture(dm))
+        seen_ids.add(dm.match_id)
+
+    logger.info(f"Enriched {len(enriched)} fixtures with Dongqiudi data")
+    return enriched
+
+
+def _enrich_with_jisu(fixtures: list[Fixture]) -> list[Fixture]:
+    """Add Chinese team names from JisuAPI when a matching fixture is found."""
+    if not config.jisu_api_key:
+        return fixtures
+
+    try:
+        jisu_fixtures = jisu_api.fetch_fifa_fixtures()
+    except Exception as exc:
+        logger.debug(f"JisuAPI enrichment skipped: {exc}")
+        return fixtures
+
+    if not jisu_fixtures:
+        return fixtures
+
+    # Index Jisu fixtures by (date, home_team_lower, away_team_lower)
+    jisu_index: dict[tuple[str, str, str], jisu_api.JisuFixture] = {}
+    for jf in jisu_fixtures:
+        if not jf.kickoff_utc:
+            continue
+        date_key = jf.kickoff_utc[:10]
+        home_key = jf.home_team.lower()
+        away_key = jf.away_team.lower()
+        jisu_index[(date_key, home_key, away_key)] = jf
+
+    enriched: list[Fixture] = []
+    for f in fixtures:
+        if not f.kickoff_utc or not f.home_team_zh:
+            # Only enrich if we don't already have Chinese names.
+            key = (f.kickoff_utc[:10], f.home_team.lower(), f.away_team.lower())
+            jf = jisu_index.get(key)
+            if jf:
+                f = Fixture(
+                    fixture_id=f.fixture_id,
+                    league=f.league,
+                    country=f.country,
+                    round=f.round,
+                    home_team=f.home_team,
+                    away_team=f.away_team,
+                    home_code=f.home_code,
+                    away_code=f.away_code,
+                    venue=f.venue,
+                    kickoff_utc=f.kickoff_utc,
+                    status=f.status,
+                    home_badge=f.home_badge,
+                    away_badge=f.away_badge,
+                    league_badge=f.league_badge,
+                    home_team_zh=jf.home_team_zh,
+                    away_team_zh=jf.away_team_zh,
+                )
+        enriched.append(f)
+
+    logger.info(f"Enriched {len(enriched)} fixtures with JisuAPI Chinese names")
+    return enriched
+
+
+def fetch_jisu_fixtures(date_str: str | None = None) -> list[Fixture]:
+    """Fetch FIFA fixtures directly from JisuAPI for a given date.
+
+    Returns an empty list if JISU_API_KEY is not configured.
+    """
+    if not config.jisu_api_key:
+        return []
+
+    if date_str is None or date_str in ("today", "tonight", "now"):
+        now_utc = datetime.utcnow()
+        user_now = now_utc + timedelta(hours=8)
+        date_str = user_now.strftime("%Y-%m-%d")
+
+    try:
+        jf_list = jisu_api.fixtures_for_date(date_str, source="fifa")
+        return [_jisu_to_fixture(jf) for jf in jf_list]
+    except Exception as exc:
+        logger.warning(f"JisuAPI fixtures fetch failed: {exc}")
+        return []
+
+
+# Chinese-name → 3-letter project code. Used to match Dongqiudi (which sends
+# Chinese names) to ESPN (which sends 3-letter codes).
+_ZH_TEAM_NAME_TO_CODE: dict[str, str] = {
+    "阿根廷": "ARG", "澳大利亚": "AUS", "比利时": "BEL", "巴西": "BRA",
+    "喀麦隆": "CMR", "加拿大": "CAN", "哥斯达黎加": "CRC", "克罗地亚": "CRO",
+    "丹麦": "DEN", "厄瓜多尔": "ECU", "英格兰": "ENG", "法国": "FRA",
+    "德国": "GER", "加纳": "GHA", "伊朗": "IRN", "日本": "JPN",
+    "墨西哥": "MEX", "摩洛哥": "MAR", "荷兰": "NED", "波兰": "POL",
+    "葡萄牙": "POR", "卡塔尔": "QAT", "沙特阿拉伯": "KSA", "塞内加尔": "SEN",
+    "塞尔维亚": "SRB", "韩国": "KOR", "西班牙": "ESP", "瑞士": "SUI",
+    "突尼斯": "TUN", "美国": "USA", "乌拉圭": "URU", "威尔士": "WAL",
+    "苏格兰": "SCO", "土耳其": "TUR", "中国": "CHN", "意大利": "ITA",
+    "乌克兰": "UKR", "奥地利": "AUT", "希腊": "GRE", "智利": "CHI",
+    "哥伦比亚": "COL", "秘鲁": "PER", "巴拉圭": "PAR", "委内瑞拉": "VEN",
+    "捷克": "CZE", "瑞典": "SWE", "挪威": "NOR", "俄罗斯": "RUS",
+    "埃及": "EGY", "海地": "HAI", "库拉索": "CUW", "佛得角": "CPV",
+    "新西兰": "NZL", "阿尔及利亚": "ALG", "约旦": "JOR", "伊拉克": "IRQ",
+    "南非": "RSA", "波黑": "BIH", "巴拿马": "PAN", "加纳": "GHA",
+    "乌兹别克斯坦": "UZB", "刚果民主共和国": "COD", "科特迪瓦": "CIV",
+    "新加坡": "SIN", "尼日利亚": "NGA", "尼加拉瓜": "NCA",
+    "危地马拉": "GUA", "萨尔瓦多": "SLV", "洪都拉斯": "HON",
+    "匈牙利": "HUN", "芬兰": "FIN", "斯洛伐克": "SVK", "黑山": "MNE",
+    "斯洛文尼亚": "SVN", "塞浦路斯": "CYP", "马里": "MLI", "卢森堡": "LUX",
+    "布基纳法索": "BFA", "巴拉圭": "PAR",
+}
+
+
+def _zh_team_name_to_code() -> dict[str, str]:
+    """Return the Chinese→code mapping. Exposed for callers/tests."""
+    return dict(_ZH_TEAM_NAME_TO_CODE)
 
 
 # A short helper: heuristic mapping for a few common names
@@ -325,6 +559,7 @@ def _fixture_to_dict(f: Fixture) -> dict[str, Any]:
         "home_code": f.home_code, "away_code": f.away_code, "venue": f.venue,
         "kickoff_utc": f.kickoff_utc, "status": f.status, "home_badge": f.home_badge,
         "away_badge": f.away_badge, "league_badge": f.league_badge,
+        "home_team_zh": f.home_team_zh, "away_team_zh": f.away_team_zh,
     }
 
 

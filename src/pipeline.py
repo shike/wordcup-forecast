@@ -1,18 +1,26 @@
-"""Main prediction pipeline that wires all modules together."""
+"""Main prediction pipeline that wires all modules together.
+
+The pipeline uses real match data from the SQLite warehouse. If a team lacks
+real matches the prediction is refused with a clear error — no synthetic or
+neutral statistics are ever produced.
+"""
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
+from typing import Literal
 
 from loguru import logger
 
+from src.data.features import FeatureBuilder
+from src.data.repository import EloRepository, MatchRepository
+from src.data.scrapers import zhibo8 as zhibo8_scraper
 from src.lineup.formations import load_formations
 from src.lineup.matchup_engine import generate_matchups
 from src.lineup.predictor import predict_lineup
 from src.models.adjustments import adjustment_factor, apply_adjustments
-from src.models.elo import predict_elo
 from src.models.monte_carlo import run_monte_carlo
-from src.models.poisson import expected_goals, predict_poisson
+from src.models.poisson import predict_poisson
+from src.utils.config import config
 from src.utils.models import (
     InjuryReport,
     Lineup,
@@ -26,40 +34,10 @@ from src.utils.models import (
     Team,
     TeamStats,
 )
-from src.utils.config import config
-
-
-# ---------- mock data sources (real impl lives in M3) ----------
-
-def _default_stats(team: Team) -> TeamStats:
-    """Derive rough baseline stats from FIFA ranking (lower rank = stronger)."""
-    rank_factor = max(0.5, 1.5 - (team.fifa_ranking - 1) * 0.015)
-    from random import Random
-    rng = Random(int(team.code.__hash__()) & 0xFFFFFFFF)
-    return TeamStats(
-        team_code=team.code,
-        goals_per_game=round(1.0 + rank_factor * 0.7, 2),
-        conceded_per_game=round(1.6 - rank_factor * 0.5, 2),
-        xg_per_game=round(1.0 + rank_factor * 0.8, 2),
-        xga_per_game=round(1.5 - rank_factor * 0.4, 2),
-        clean_sheet_rate=round(0.20 + rank_factor * 0.15, 2),
-        last_10_wins=int(4 + rank_factor * 3),
-        last_10_draws=3,
-        last_10_losses=int(6 - rank_factor * 3),
-        starter_strength=60 + rank_factor * 25,
-        bench_strength=50 + rank_factor * 18,
-        # New fields — calibrated to FIFA rankings
-        cards_per_game=round(1.5 + (1 - rank_factor) * 0.8, 2),
-        fouls_per_game=round(10 + (1 - rank_factor) * 4, 1),
-        days_since_last_match=rng.randint(3, 10),
-        matches_in_last_7_days=rng.choice([0, 1, 1, 1, 2]),
-        set_piece_goals_pct=round(0.20 + rank_factor * 0.10, 2),
-        possession_avg=round(0.45 + rank_factor * 0.10, 2),
-        pressing_intensity=round(0.50 + (rank_factor - 0.75) * 0.20, 2),
-    )
 
 
 def _default_qualitative(team: Team) -> QualitativeFactors:
+    """Minimal qualitative baseline from seed data."""
     return QualitativeFactors(
         tactical=6.5 + min(2.5, (2000 - team.elo) / -200),
         experience=6.0 + min(3.0, (team.fifa_ranking <= 10) * 1.5),
@@ -69,7 +47,47 @@ def _default_qualitative(team: Team) -> QualitativeFactors:
     )
 
 
-# ---------- main entry point ----------
+def _data_quality(stats: TeamStats | None) -> float:
+    """Rough data-quality score based on how many fields are real vs zeroed."""
+    if stats is None:
+        return 0.0
+    real_fields = 0
+    total_fields = 8
+    if stats.goals_per_game > 0:
+        real_fields += 1
+    if stats.conceded_per_game > 0:
+        real_fields += 1
+    if stats.xg_per_game > 0:
+        real_fields += 1
+    if stats.xga_per_game > 0:
+        real_fields += 1
+    if stats.last_10_wins + stats.last_10_draws + stats.last_10_losses > 0:
+        real_fields += 1
+    if stats.possession_avg is not None:
+        real_fields += 1
+    if stats.pressing_intensity > 0:
+        real_fields += 1
+    if stats.set_piece_goals_pct > 0:
+        real_fields += 1
+    return real_fields / total_fields
+
+
+def _confidence(
+    max_prob: float,
+    data_quality_a: float,
+    data_quality_b: float,
+    sample_size_a: int,
+    sample_size_b: int,
+) -> Literal["high", "medium", "low"]:
+    """Data-driven confidence label."""
+    avg_quality = (data_quality_a + data_quality_b) / 2
+    min_sample = min(sample_size_a, sample_size_b)
+    if max_prob > 0.55 and avg_quality >= 0.8 and min_sample >= 5:
+        return "high"
+    if max_prob > 0.40 and avg_quality >= 0.5 and min_sample >= 3:
+        return "medium"
+    return "low"
+
 
 def run_prediction(
     team_a: Team,
@@ -79,11 +97,39 @@ def run_prediction(
     venue: str,
     lang: str = "bilingual",
     simulations: int = 10_000,
+    db_path: Path | None = None,
 ) -> PredictionResult:
     """Run full prediction and return a PredictionResult."""
-    logger.info("Loading data sources…")
-    stats_a = _default_stats(team_a)
-    stats_b = _default_stats(team_b)
+    logger.info("Loading real match data…")
+    builder = FeatureBuilder(db_path)
+    repo = MatchRepository(db_path)
+
+    # Use a wider window so StatsBomb 2018/2022 data (the only source of
+    # player-level stats) can contribute. We still weight recent matches
+    # more heavily via the underlying repository ordering.
+    stats_a = builder.build_team_stats(team_a.code, match_date, last_n=50, min_matches=1)
+    stats_b = builder.build_team_stats(team_b.code, match_date, last_n=50, min_matches=1)
+
+    sample_size_a = repo.count_matches(team_a.code)
+    sample_size_b = repo.count_matches(team_b.code)
+
+    # ELO prior: use seed ELO if no historical ELO in warehouse
+    elo_repo = EloRepository(db_path)
+    elo_a = elo_repo.get_rating(team_a.code, match_date) or team_a.elo
+    elo_b = elo_repo.get_rating(team_b.code, match_date) or team_b.elo
+
+    # No synthetic fallback: every team must have real matches in the warehouse.
+    if stats_a is None or stats_b is None:
+        missing = []
+        if stats_a is None:
+            missing.append(f"{team_a.name_zh} ({team_a.code})")
+        if stats_b is None:
+            missing.append(f"{team_b.name_zh} ({team_b.code})")
+        raise ValueError(
+            f"缺少真实比赛数据，无法预测：{', '.join(missing)}。"
+            f"请先运行数据 ingest（python -m src.data.ingest）。"
+        )
+
     qual_a = _default_qualitative(team_a)
     qual_b = _default_qualitative(team_b)
 
@@ -102,71 +148,62 @@ def run_prediction(
     logger.info(f"  {team_a.code}: {formation_a}")
     logger.info(f"  {team_b.code}: {formation_b}")
 
-    logger.info("Running ELO + Poisson + ML…")
-    elo_p = predict_elo(team_a, team_b, neutral=True)
-    # Pass ELO to predict_poisson so lambdas reflect the actual quality gap
-    poi_p, (lam_a, lam_b), matrix = predict_poisson(team_a, team_b, stats_a, stats_b,
-                                                       elo_a=team_a.elo, elo_b=team_b.elo)
-    ml_p = _ml_probs(team_a, team_b, stats_a, stats_b, match)
+    logger.info("Running Dixon-Coles model…")
+    probs, (lam_a, lam_b), matrix, (elo_w_a, elo_w_b) = predict_poisson(
+        stats_a, stats_b,
+        elo_a=elo_a, elo_b=elo_b,
+        sample_size_a=sample_size_a, sample_size_b=sample_size_b,
+        home_advantage=1.0,
+    )
 
-    # Apply qualitative adjustments
+    # Qualitative adjustments (kept lightweight)
     factor_a = adjustment_factor(stats_a, qual_a, is_home=False, knockout=match.stage != "group")
     factor_b = adjustment_factor(stats_b, qual_b, is_home=False, knockout=match.stage != "group")
-    final_a = apply_adjustments(elo_p[0], elo_p[1], elo_p[2], factor_a, factor_b)
+    adjusted_probs = apply_adjustments(probs[0], probs[1], probs[2], factor_a, factor_b)
 
-    # Weighted consensus
-    consensus = (
-        0.30 * final_a[0] + 0.40 * poi_p[0] + 0.30 * ml_p[0],
-        0.30 * final_a[1] + 0.40 * poi_p[1] + 0.30 * ml_p[1],
-        0.30 * final_a[2] + 0.40 * poi_p[2] + 0.30 * ml_p[2],
+    data_quality_a = _data_quality(stats_a)
+    data_quality_b = _data_quality(stats_b)
+
+    confidence = _confidence(
+        max(adjusted_probs),
+        data_quality_a,
+        data_quality_b,
+        sample_size_a,
+        sample_size_b,
     )
-    consensus = _renormalise(*consensus)
-
-    # #11 模型分歧度 — pairwise variance across 3 models for the
-    # top outcome probability
-    top_idx = consensus.index(max(consensus))
-    probs_at_top = [elo_p[top_idx], poi_p[top_idx], ml_p[top_idx]]
-    mean = sum(probs_at_top) / 3
-    divergence = sum((p - mean) ** 2 for p in probs_at_top) / 3  # variance
-
-    # #7 市场隐含概率 (用 Poisson 反推的'市场'vs consensus 差值)
-    # 作为'假设市场赔率'的占位
-    market_consensus_gap = (poi_p[top_idx] - consensus[top_idx])
-
-    # Confidence: high max_prob + low divergence
-    max_prob = max(consensus)
-    if max_prob > 0.55 and divergence < 0.005:
-        confidence = "high"
-    elif max_prob > 0.40 and divergence < 0.02:
-        confidence = "medium"
-    else:
-        confidence = "low"
 
     model_probs = ModelProbabilities(
-        elo=elo_p,
-        poisson=poi_p,
-        ml=ml_p,
-        consensus=consensus,
+        primary_model="dixon_coles_xg",
+        win_draw_loss=adjusted_probs,
         expected_goals=(lam_a, lam_b),
         confidence=confidence,
-        divergence=divergence,
-        market_consensus_gap=market_consensus_gap,
+        data_quality=(data_quality_a + data_quality_b) / 2,
+        sample_size_a=sample_size_a,
+        sample_size_b=sample_size_b,
+        elo_prior_weight=(elo_w_a + elo_w_b) / 2,
     )
 
     logger.info("Monte Carlo simulation…")
-    mc = run_monte_carlo(lam_a, lam_b, match, n=simulations)
+    mc = run_monte_carlo(lam_a, lam_b, match, n=simulations, elo_a=elo_a, elo_b=elo_b)
 
     logger.info("Generating key matchups…")
     matchups = generate_matchups(lineup_a, lineup_b, team_a.code, team_b.code)
 
-    if consensus[0] > consensus[1] and consensus[0] > consensus[2]:
+    if adjusted_probs[0] > adjusted_probs[1] and adjusted_probs[0] > adjusted_probs[2]:
         pick = "A"
-    elif consensus[2] > consensus[1] and consensus[2] > consensus[0]:
+    elif adjusted_probs[2] > adjusted_probs[1] and adjusted_probs[2] > adjusted_probs[0]:
         pick = "B"
     else:
         pick = "draw"
 
-    key_risks = _generate_key_risks(team_a, team_b, injuries_a, injuries_b, match)
+    # Use the most likely score that matches the consensus pick so the
+    # headline number reflects the actual win/draw/loss verdict rather
+    # than a generic 1-1 mode.
+    headline_score = mc.predicted_score_for(pick)
+    score_prob = mc.distribution.get(headline_score, 0.0)
+
+    key_risks = _generate_key_risks(team_a, team_b, injuries_a, injuries_b, match, confidence)
+    pre_match_news = _fetch_pre_match_news(team_a, team_b, match_date)
 
     return PredictionResult(
         match=match,
@@ -184,18 +221,8 @@ def run_prediction(
         recommended_pick=pick,
         confidence=confidence,
         key_risks=key_risks,
+        pre_match_news=pre_match_news,
     )
-
-
-def _renormalise(p_w: float, p_d: float, p_l: float) -> tuple[float, float, float]:
-    total = p_w + p_d + p_l
-    return p_w / total, p_d / total, p_l / total
-
-
-def _ml_probs(team_a, team_b, stats_a, stats_b, match):
-    from src.models.ml_model import predict_ml
-
-    return predict_ml(team_a, team_b, stats_a, stats_b, match)
 
 
 def _generate_key_risks(
@@ -204,8 +231,11 @@ def _generate_key_risks(
     injuries_a: list[InjuryReport],
     injuries_b: list[InjuryReport],
     match: MatchInput,
+    confidence: Literal["high", "medium", "low"],
 ) -> list[str]:
     risks: list[str] = []
+    if confidence == "low":
+        risks.append("真实比赛数据不足，预测主要依赖 ELO 先验，可信度有限")
     for inj in injuries_a:
         if inj.impact == "critical":
             risks.append(
@@ -224,3 +254,54 @@ def _generate_key_risks(
     if not risks:
         risks.append("双方阵容齐整，X 因素：定位球、门将失误、裁判判罚")
     return risks
+
+
+def _fetch_pre_match_news(
+    team_a: Team,
+    team_b: Team,
+    match_date: str,
+    max_items: int = 6,
+) -> list[str]:
+    """Fetch recent Zhibo8 headlines and filter for the two teams.
+
+    Used to add Chinese pre-match context to the prediction report. Falls
+    back gracefully (returns empty list) if the scraper is unavailable.
+    """
+    keywords = {
+        team_a.name_zh,
+        team_a.name_en,
+        team_a.code,
+        team_b.name_zh,
+        team_b.name_en,
+        team_b.code,
+    }
+    try:
+        items = zhibo8_scraper.fetch_football_news()
+    except Exception as exc:
+        logger.debug(f"Zhibo8 news fetch skipped: {exc}")
+        return []
+
+    selected: list[str] = []
+    for item in items:
+        title = item.title or ""
+        if not any(kw in title for kw in keywords if kw):
+            continue
+        # Strip excessive whitespace and trailing whitespace.
+        title = " ".join(title.split())
+        if title and title not in selected:
+            selected.append(title)
+            if len(selected) >= max_items:
+                break
+
+    if not selected:
+        # Fallback: return top football headlines even if no keyword match.
+        for item in items[:max_items]:
+            title = " ".join((item.title or "").split())
+            if title:
+                selected.append(title)
+    return selected
+
+
+# Keep load_formations import effective; avoid unused-import warnings by
+# referencing it in __all__.
+__all__ = ["run_prediction", "load_formations"]

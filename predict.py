@@ -181,9 +181,9 @@ def main() -> None:
         )
         if args.dry_run:
             print(f"开球: {match_date} {kickoff_cst} (北京时间)  ·  场地: {venue_zh}")
-            print(f"Win A: {result.model_probs.consensus[0]:.1%}")
-            print(f"Draw : {result.model_probs.consensus[1]:.1%}")
-            print(f"Win B: {result.model_probs.consensus[2]:.1%}")
+            print(f"Win A: {result.model_probs.win_draw_loss[0]:.1%}")
+            print(f"Draw : {result.model_probs.win_draw_loss[1]:.1%}")
+            print(f"Win B: {result.model_probs.win_draw_loss[2]:.1%}")
             return
         from src.ppt.builder import build_ppt
         output_path = Path(args.output) if args.output else None
@@ -215,9 +215,9 @@ def main() -> None:
 
     if args.dry_run:
         logger.info("Dry run — skipping PPT generation")
-        print(f"Win A: {result.model_probs.consensus[0]:.1%}")
-        print(f"Draw : {result.model_probs.consensus[1]:.1%}")
-        print(f"Win B: {result.model_probs.consensus[2]:.1%}")
+        print(f"Win A: {result.model_probs.win_draw_loss[0]:.1%}")
+        print(f"Draw : {result.model_probs.win_draw_loss[1]:.1%}")
+        print(f"Win B: {result.model_probs.win_draw_loss[2]:.1%}")
         return
 
     from src.ppt.builder import build_ppt

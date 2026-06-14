@@ -137,12 +137,11 @@ T = {
     "schedule": {"zh": "赛程密度", "en": "Schedule"},
 
     # model
-    "model_output": {"zh": "模型输出对比", "en": "Model Output"},
-    "elo_model": {"zh": "ELO 模型", "en": "ELO Model"},
-    "poisson_model": {"zh": "Poisson 模型", "en": "Poisson Model"},
-    "ml_model": {"zh": "XGBoost 模型", "en": "XGBoost Model"},
-    "consensus": {"zh": "综合概率", "en": "Consensus"},
-    "model_comparison": {"zh": "三模型概率对比", "en": "Model Probability Comparison"},
+    "model_output": {"zh": "模型输出", "en": "Model Output"},
+    "dixon_coles_model": {"zh": "Dixon-Coles 模型", "en": "Dixon-Coles Model"},
+    "data_quality": {"zh": "数据质量", "en": "Data Quality"},
+    "sample_size": {"zh": "样本量", "en": "Sample Size"},
+    "elo_prior": {"zh": "ELO 先验权重", "en": "ELO Prior Weight"},
     "probability": {"zh": "概率", "en": "Probability"},
     "win": {"zh": "胜", "en": "Win"},
     "draw": {"zh": "平", "en": "Draw"},

@@ -26,7 +26,7 @@ from src.ppt.charts import (
     sensitivity_tornado,
 )
 from src.ppt.pitch_layout import draw_pitch_with_lineup
-from src.ppt.player_card import render_player_card
+from src.ppt.player_card import player_has_photo, render_player_card
 from src.ppt.styles import (
     BG_CARD,
     BG_DEEP,
@@ -67,6 +67,7 @@ from src.utils.models import (
     Team,
     TeamStats,
 )
+from src.data.repository import MatchRepository
 from src.data.wikipedia_client import batch_augment_squad
 
 
@@ -365,7 +366,7 @@ def _page_cover(prs, result: PredictionResult) -> None:
     )
 
     # Right side: probability numbers
-    p = result.model_probs.consensus
+    p = result.model_probs.win_draw_loss
     right_left = MARGIN + Inches(6.6)
     _add_panel(slide, right_left, Inches(4.6), Inches(5.5), Inches(2.1), fill=BG_PANEL)
     _add_textbox(
@@ -409,7 +410,7 @@ def _page_summary(prs, result: PredictionResult) -> None:
     _bg(slide)
     _page_header(slide, "执行摘要", "Executive Summary", 2,
                  team_a=result.match.team_a, team_b=result.match.team_b)
-    p = result.model_probs.consensus
+    p = result.model_probs.win_draw_loss
     team_a = result.match.team_a
     team_b = result.match.team_b
     predicted_score = result.monte_carlo.predicted_score
@@ -465,6 +466,56 @@ def _page_summary(prs, result: PredictionResult) -> None:
                 font_size=Pt(32), bold=True, color=WHITE, font_name=FONT_MONO, align=PP_ALIGN.CENTER)
 
 
+def _page_pre_match_news(prs, result: PredictionResult) -> None:
+    """Show recent Chinese-language headlines relevant to the two teams.
+
+    Sourced from Zhibo8's public 24-hour hot-news feed. Empty if the scraper
+    could not reach Zhibo8 or no headlines matched the two teams.
+    """
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    _bg(slide)
+    _page_header(
+        slide,
+        "赛前热点",
+        "Pre-Match Headlines",
+        4,
+        team_a=result.match.team_a,
+        team_b=result.match.team_b,
+    )
+
+    _add_textbox(
+        slide, MARGIN, Inches(1.4), Inches(12.1), Inches(0.4),
+        "近 24 小时中文体育热点  ·  来源：直播吧 (zhibo8.cc)",
+        font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True,
+    )
+
+    news = result.pre_match_news
+    if not news:
+        _add_textbox(
+            slide, MARGIN, Inches(2.4), Inches(12.1), Inches(0.8),
+            "暂无相关热点（直播吧当前无新情报或网络受限）",
+            font_size=Pt(14), color=GREY, font_name=FONT_CN_BODY,
+            align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE,
+        )
+        return
+
+    # Two-column layout, max 6 headlines.
+    panel_h = Inches(5.4)
+    _add_panel(slide, MARGIN, Inches(1.9), Inches(12.1), panel_h, fill=BG_CARD)
+    for i, headline in enumerate(news[:6]):
+        # Truncate very long titles to keep the slide clean.
+        display = headline if len(headline) <= 80 else headline[:78] + "…"
+        _add_textbox(
+            slide,
+            MARGIN + Inches(0.3),
+            Inches(2.1) + Inches(i * 0.82),
+            Inches(11.5),
+            Inches(0.7),
+            f"•  {display}",
+            font_size=Pt(13), color=WHITE, font_name=FONT_CN_BODY,
+        )
+
+
 def _page_toc(prs, result: PredictionResult) -> None:
     """#16 Table of contents."""
     slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -474,23 +525,24 @@ def _page_toc(prs, result: PredictionResult) -> None:
     sections = [
         ("一", "执行摘要", "Executive Summary", "比分 + 三模型概率 + 信心指数"),
         ("二", "目录", "Contents", "本报告各章节导览"),
-        ("三", "大赛背景", "Tournament Context", "FIFA 世界杯 2026 主办国/规则/决赛"),
-        ("四", "球队档案", "Team Profile", "FIFA 排名/ELO/教练/队长/伤停"),
-        ("五", "历史交锋", "Head-to-Head", "近 5 次交锋结果 + 进球者"),
-        ("六", "近期状态", "Recent Form", "近 10 场胜负 + 攻守数据"),
-        ("七", "预测首发", "Predicted Lineup A", "加拿大 阵型 + 11 人首发"),
-        ("八", "预测首发", "Predicted Lineup B", "波黑 阵型 + 11 人首发"),
-        ("九", "核心球员", "Key Players A", "加拿大 TOP 5 球员"),
-        ("十", "核心球员", "Key Players B", "波黑 TOP 5 球员"),
-        ("十一", "关键对位", "Key Matchups", "4 组 1v1 对决"),
-        ("十二", "阵容深度", "Squad Depth", "首发 vs 替补战力 + 替补名单"),
-        ("十三", "球队能力对比", "Team Capabilities", "6 维能力雷达"),
-        ("十四", "比赛环境", "Match Environment", "赛程疲劳 + 裁判尺度 + 伤停"),
-        ("十五", "三模型对比", "Model Output", "ELO/Poisson/XGBoost 概率对比"),
-        ("十六", "蒙特卡洛", "Monte Carlo", "10000 次模拟 + 进球数分布 + 大/小 2.5"),
-        ("十七", "敏感性分析", "Sensitivity", "影响最大的 6 个变量"),
-        ("十八", "最终预测", "Final Prediction", "绝对比分 + 信心指数 + 关键风险"),
-        ("十九", "附录", "Appendix", "数据源 + 方法 + 免责声明"),
+        ("三", "赛前热点", "Pre-Match Headlines", "近 24h 直播吧中文热点（伤停/阵容/情报）"),
+        ("四", "大赛背景", "Tournament Context", "FIFA 世界杯 2026 主办国/规则/决赛"),
+        ("五", "球队档案", "Team Profile", "FIFA 排名/ELO/教练/队长/伤停"),
+        ("六", "历史交锋", "Head-to-Head", "近 5 次交锋结果 + 进球者"),
+        ("七", "近期状态", "Recent Form", "近 10 场胜负 + 攻守数据"),
+        ("八", "预测首发", "Predicted Lineup A", "加拿大 阵型 + 11 人首发"),
+        ("九", "预测首发", "Predicted Lineup B", "波黑 阵型 + 11 人首发"),
+        ("十", "核心球员", "Key Players A", "加拿大 TOP 5 球员"),
+        ("十一", "核心球员", "Key Players B", "波黑 TOP 5 球员"),
+        ("十二", "关键对位", "Key Matchups", "4 组 1v1 对决"),
+        ("十三", "阵容深度", "Squad Depth", "首发 vs 替补战力 + 替补名单"),
+        ("十四", "球队能力对比", "Team Capabilities", "6 维能力雷达"),
+        ("十五", "比赛环境", "Match Environment", "赛程疲劳 + 裁判尺度 + 伤停"),
+        ("十六", "三模型对比", "Model Output", "ELO/Poisson/XGBoost 概率对比"),
+        ("十七", "蒙特卡洛", "Monte Carlo", "10000 次模拟 + 进球数分布 + 大/小 2.5"),
+        ("十八", "敏感性分析", "Sensitivity", "影响最大的 6 个变量"),
+        ("十九", "最终预测", "Final Prediction", "绝对比分 + 信心指数 + 关键风险"),
+        ("二十", "附录", "Appendix", "数据源 + 方法 + 免责声明"),
     ]
     # Two columns
     y_top = Inches(1.2)
@@ -514,7 +566,7 @@ def _page_world_cup_context(prs, result: PredictionResult) -> None:
     """#7 World Cup 2026 background / venue info — inserted before team profile."""
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "大赛背景", "Tournament Context", 4,
+    _page_header(slide, "大赛背景", "Tournament Context", 5,
                  team_a=result.match.team_a, team_b=result.match.team_b)
     team_a = result.match.team_a
     team_b = result.match.team_b
@@ -597,48 +649,39 @@ def _page_world_cup_context(prs, result: PredictionResult) -> None:
 
 
 def _page_h2h(prs, result: PredictionResult) -> None:
-    """#5 + #8 historical H2H page with dates and goal scorers."""
+    """#5 + #8 historical H2H page using real warehouse data."""
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "历史交锋", "Head-to-Head Record", 6,
+    _page_header(slide, "历史交锋", "Head-to-Head Record", 7,
                  team_a=result.match.team_a, team_b=result.match.team_b)
     team_a = result.match.team_a
     team_b = result.match.team_b
 
-    elo_a = team_a.elo
-    elo_b = team_b.elo
-    skill = (elo_a - elo_b) / 200.0
-    p_a = 1 / (1 + 2.71828 ** (-1.5 * skill))
-    p_b = 1 - p_a
-    p_draw = max(0.15, 0.30 - 0.10 * abs(skill))
-    total = p_a + p_b + p_draw
-    p_a /= total
-    p_b /= total
-    p_draw /= total
+    # Load real H2H matches from the warehouse
+    repo = MatchRepository()
+    h2h_matches = repo.get_matches(team_code=team_a.code) + repo.get_matches(team_code=team_b.code)
+    # Keep only matches where both teams played each other, and the match is before the current one
+    h2h_matches = [
+        m for m in h2h_matches
+        if {m.home_team_code, m.away_team_code} == {team_a.code, team_b.code}
+        and m.date < result.match.match_date
+    ]
+    h2h_matches = sorted(h2h_matches, key=lambda m: m.date, reverse=True)
 
-    n_meetings = 10
-    from random import Random
-    rng = Random(int(hash(team_a.code + team_b.code) & 0xFFFFFFFF))
     wins_a = draws = wins_b = 0
-    history = []
-    for k in range(n_meetings):
-        r = rng.random()
-        if r < p_a:
+    for m in h2h_matches:
+        if m.home_goals is None or m.away_goals is None:
+            continue
+        a_goals = m.home_goals if m.home_team_code == team_a.code else m.away_goals
+        b_goals = m.away_goals if m.home_team_code == team_a.code else m.home_goals
+        if a_goals > b_goals:
             wins_a += 1
-            history.append(("胜", team_a.name_zh, team_b.name_zh))
-        elif r < p_a + p_b:
-            wins_b += 1
-            history.append(("胜", team_b.name_zh, team_a.name_zh))
-        else:
+        elif a_goals == b_goals:
             draws += 1
-            history.append(("平", team_a.name_zh, team_b.name_zh))
+        else:
+            wins_b += 1
 
-    # #8 Generate fake dates / venues / scorers for the last 5 meetings
-    venues = ["主场", "客场", "主场", "中立场", "中立场"]
-    months = ["08", "11", "03", "10", "06"]
-    years = ["2018", "2019", "2021", "2022", "2024"]
-    a_players = [p.display_name_cn() for p in result.lineup_a.players[:5]] or [team_a.captain_zh]
-    b_players = [p.display_name_cn() for p in result.lineup_b.players[:5]] or [team_b.captain_zh]
+    n_meetings = len(h2h_matches)
 
     # Headline numbers
     _add_panel(slide, MARGIN, Inches(1.4), Inches(12.1), Inches(1.4), fill=BG_PANEL)
@@ -658,59 +701,67 @@ def _page_h2h(prs, result: PredictionResult) -> None:
                     f"{val}", font_size=Pt(40), bold=True, color=color, font_name=FONT_MONO,
                     align=PP_ALIGN.CENTER)
 
-    # #8 Recent meetings list with dates + scorers
+    # Recent meetings list
     _add_textbox(slide, MARGIN, Inches(3.1), Inches(12), Inches(0.4),
-                "近 5 次交锋（带日期和进球者）  ·  RECENT MEETINGS WITH DATES & SCORERS",
+                "近 5 次交锋（真实数据）  ·  RECENT MEETINGS",
                 font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY)
-    recent5 = history[-5:]
-    for i, (result_text, winner, loser) in enumerate(recent5):
+
+    recent5 = h2h_matches[:5]
+    if not recent5:
+        _add_textbox(slide, MARGIN, Inches(3.6), Inches(12), Inches(0.5),
+                    "暂无历史交锋记录  ·  No historical meetings in database",
+                    font_size=Pt(12), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
+
+    for i, m in enumerate(recent5):
         col = i % 5
         x = MARGIN + col * Inches(2.45)
         y = Inches(3.55)
-        color = GREEN if result_text == "胜" else GREY
+        a_goals = m.home_goals if m.home_team_code == team_a.code else m.away_goals
+        b_goals = m.away_goals if m.home_team_code == team_a.code else m.home_goals
+        if a_goals is None or b_goals is None:
+            continue
+        result_text = "胜" if a_goals > b_goals else ("平" if a_goals == b_goals else "负")
+        color = GREEN if result_text == "胜" else (GREY if result_text == "平" else RED)
+        venue = "中立场" if m.neutral else ("主场" if m.home_team_code == team_a.code else "客场")
+
         _add_panel(slide, x, y, Inches(2.35), Inches(2.0), fill=BG_CARD)
         _add_textbox(slide, x, y + Inches(0.1), Inches(2.35), Inches(0.4),
-                    f"{years[i]}-{months[i]}", font_size=Pt(10), color=GREY, font_name=FONT_MONO,
+                    m.date, font_size=Pt(10), color=GREY, font_name=FONT_MONO,
                     align=PP_ALIGN.CENTER)
         _add_textbox(slide, x, y + Inches(0.4), Inches(2.35), Inches(0.4),
                     result_text, font_size=Pt(24), bold=True, color=color, font_name=FONT_CN_BODY,
                     align=PP_ALIGN.CENTER)
         _add_textbox(slide, x, y + Inches(0.85), Inches(2.35), Inches(0.3),
-                    f"{venues[i]}", font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY,
+                    venue, font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY,
                     align=PP_ALIGN.CENTER)
         _add_textbox(slide, x, y + Inches(1.15), Inches(2.35), Inches(0.3),
-                    f"{winner} 胜", font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY,
+                    f"{team_a.name_zh} {a_goals} - {b_goals} {team_b.name_zh}",
+                    font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY,
                     align=PP_ALIGN.CENTER, bold=True)
-        # Top scorer for the winning side
-        scorer = rng.choice(a_players if winner == team_a.name_zh else b_players)
-        _add_textbox(slide, x, y + Inches(1.45), Inches(2.35), Inches(0.3),
-                    f"进球：{scorer}", font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY,
+        _add_textbox(slide, x, y + Inches(1.55), Inches(2.35), Inches(0.3),
+                    m.competition, font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY,
                     align=PP_ALIGN.CENTER)
-        # Synthesized score
-        if result_text == "胜":
-            ws = rng.randint(1, 3)
-            ls = rng.randint(0, ws - 1)
-        else:
-            dg = rng.randint(0, 2)
-            ws = dg
-            ls = dg
-        _add_textbox(slide, x, y + Inches(1.7), Inches(2.35), Inches(0.3),
-                    f"比分  {ws}-{ls}", font_size=Pt(11), color=color, font_name=FONT_MONO,
-                    align=PP_ALIGN.CENTER, bold=True)
 
     # Aggregate stat
     _add_textbox(slide, MARGIN, Inches(5.85), Inches(12), Inches(0.5),
                 f"历史交锋总战绩  ·  ALL-TIME RECORD",
                 font_size=Pt(13), bold=True, color=GOLD, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
+    if n_meetings > 0:
+        record_text = (
+            f"{team_a.name_zh} {wins_a} 胜  ·  {draws} 平  ·  {wins_b} 胜 {team_b.name_zh}    "
+            f"(近 {n_meetings} 场胜率：{team_a.name_zh} {wins_a/n_meetings*100:.0f}%  ·  {team_b.name_zh} {wins_b/n_meetings*100:.0f}%)"
+        )
+    else:
+        record_text = "数据库中暂无两队交锋记录  ·  No H2H data available"
     _add_textbox(slide, MARGIN, Inches(6.3), Inches(12), Inches(0.6),
-                f"{team_a.name_zh} {wins_a} 胜  ·  {draws} 平  ·  {wins_b} 胜 {team_b.name_zh}    (近 {n_meetings} 场胜率：{team_a.name_zh} {wins_a/n_meetings*100:.0f}%  ·  {team_b.name_zh} {wins_b/n_meetings*100:.0f}%)",
+                record_text,
                 font_size=Pt(14), color=WHITE, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
 
 
 def _page_team_profile(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "球队档案", "Team Profile", 5,
+    _page_header(slide, "球队档案", "Team Profile", 6,
                  team_a=result.match.team_a, team_b=result.match.team_b)
     team_a = result.match.team_a
     team_b = result.match.team_b
@@ -783,36 +834,39 @@ def _page_team_profile(prs, result: PredictionResult) -> None:
 def _page_recent_form(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "近期状态", "Recent Form (Last 10 Matches)", 7,
+    _page_header(slide, "近期状态", "Recent Form (Last 10 Matches)", 8,
                  team_a=result.match.team_a, team_b=result.match.team_b)
     team_a = result.match.team_a
     team_b = result.match.team_b
 
-    # Build synthetic 10-game form from stats
-    def gen_form(stats: TeamStats) -> list[str]:
-        strength = stats.avg_player_rating
-        from random import Random
-        rng = Random(int(stats.team_code.__hash__()))
-        results = []
-        for _ in range(10):
-            r = rng.random()
-            if r < (strength - 6.5) * 0.3 + 0.4:
-                results.append("胜")
-            elif r < 0.7:
-                results.append("平")
+    repo = MatchRepository()
+
+    def _team_form(team_code: str, match_date: str) -> list[str]:
+        """Return W/D/L strings for the last 10 matches before match_date."""
+        matches = repo.get_matches(team_code=team_code, before=match_date, limit=10)
+        form: list[str] = []
+        for m in sorted(matches, key=lambda x: x.date):
+            if m.home_goals is None or m.away_goals is None:
+                continue
+            team_goals = m.home_goals if m.home_team_code == team_code else m.away_goals
+            opp_goals = m.away_goals if m.home_team_code == team_code else m.home_goals
+            if team_goals > opp_goals:
+                form.append("胜")
+            elif team_goals == opp_goals:
+                form.append("平")
             else:
-                results.append("负")
-        return results
+                form.append("负")
+        return form
 
-    form_a = gen_form(result.team_a_stats)
-    form_b = gen_form(result.team_b_stats)
+    form_a = _team_form(team_a.code, result.match.match_date)
+    form_b = _team_form(team_b.code, result.match.match_date)
 
-    # Bigger, bolder team name + chips (#4, #10)
     def render_team_form(name_zh: str, name_en: str, form: list[str], top: float, color) -> None:
         _add_textbox(slide, MARGIN, top, Inches(3), Inches(0.6),
                     name_zh, font_size=Pt(28), bold=True, color=WHITE, font_name=FONT_CN_BODY)
+        actual_n = len(form)
         _add_textbox(slide, MARGIN, top + Inches(0.6), Inches(3), Inches(0.3),
-                    f"近 10 场  ·  {name_en}", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
+                    f"近 {actual_n} 场  ·  Last {actual_n}", font_size=Pt(10), color=GREY, font_name=FONT_CN_BODY)
         # W/D/L summary line
         w = sum(1 for r in form if r == "胜")
         d = sum(1 for r in form if r == "平")
@@ -820,7 +874,7 @@ def _page_recent_form(prs, result: PredictionResult) -> None:
         _add_textbox(slide, MARGIN, top + Inches(0.95), Inches(3), Inches(0.3),
                     f"  胜 {w}    平 {d}    负 {l}", font_size=Pt(11), color=color, bold=True,
                     font_name=FONT_CN_BODY)
-        # Bigger chips, 1.0x1.0 each, spaced 0.95 apart
+        # Chips
         for i, r in enumerate(form):
             chip_color = GREEN if r == "胜" else (GREY if r == "平" else RED)
             chip_left = MARGIN + Inches(3.0) + i * Inches(0.92)
@@ -832,7 +886,7 @@ def _page_recent_form(prs, result: PredictionResult) -> None:
     render_team_form(team_a.name_zh, team_a.name_en, form_a, Inches(1.5), GOLD)
     render_team_form(team_b.name_zh, team_b.name_en, form_b, Inches(3.4), CYAN)
 
-    # Stats summary — each metric on its own line so it doesn't get cramped
+    # Stats summary
     y3 = Inches(5.0)
     for side_x, side_team, side_color, side_stats in [
         (MARGIN, team_a, GOLD, result.team_a_stats),
@@ -843,18 +897,17 @@ def _page_recent_form(prs, result: PredictionResult) -> None:
                     f"{side_team.name_zh}  ·  统计概览", font_size=Pt(13), bold=True,
                     color=side_color, font_name=FONT_CN_BODY)
         s = side_stats
-        # Two compact rows
         _add_textbox(slide, side_x + Inches(0.3), y3 + Inches(0.45), Inches(5.5), Inches(0.3),
                     f"  场均进球：{s.goals_per_game:.2f}    场均失球：{s.conceded_per_game:.2f}    xG：{s.xg_per_game:.2f}",
                     font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
         _add_textbox(slide, side_x + Inches(0.3), y3 + Inches(0.75), Inches(5.5), Inches(0.3),
-                    f"  零封率：{s.clean_sheet_rate:.0%}    关键传球：{s.key_passes_per_game:.1f}    球员平均评分：{s.avg_player_rating:.1f}",
+                    f"  零封率：{s.clean_sheet_rate:.0%}    关键传球：{s.key_passes_per_game:.1f}    样本量：{s.last_10_wins + s.last_10_draws + s.last_10_losses}",
                     font_size=Pt(11), color=WHITE, font_name=FONT_CN_BODY)
         _add_textbox(slide, side_x + Inches(0.3), y3 + Inches(1.05), Inches(5.5), Inches(0.3),
                     f"  抢断：{s.tackles_per_game:.0f}    拦截：{s.interceptions_per_game:.0f}    射门精度：{s.shot_accuracy:.0%}",
                     font_size=Pt(11), color=GREY, font_name=FONT_CN_BODY)
         _add_textbox(slide, side_x + Inches(0.3), y3 + Inches(1.4), Inches(5.5), Inches(0.3),
-                    f"  胜{s.last_10_wins} 平{s.last_10_draws} 负{s.last_10_losses}  /  10",
+                    f"  胜{s.last_10_wins} 平{s.last_10_draws} 负{s.last_10_losses}",
                     font_size=Pt(11), color=side_color, font_name=FONT_CN_BODY, bold=True)
 
 
@@ -868,7 +921,7 @@ def _page_predicted_lineup(prs, result: PredictionResult, side: str = "A") -> No
     kit = team_a.home_kit_color if side == "A" else team_b.home_kit_color
 
     _page_header(slide, f"预测首发 · {team.name_zh}", f"Predicted Lineup · {team.name_en}",
-                 8 if side == "A" else 9, team_a=team, team_b=team)
+                 9 if side == "A" else 10, team_a=team, team_b=team)
     _add_textbox(slide, MARGIN, Inches(1.2), Inches(12), Inches(0.4),
                 f"阵型：{lineup.formation}  ·  FORMATION", font_size=Pt(15), bold=True, color=GOLD, font_name=FONT_CN_BODY)
 
@@ -908,12 +961,18 @@ def _page_key_players(prs, result: PredictionResult, side: str = "A") -> None:
     team = result.match.team_a if side == "A" else result.match.team_b
     lineup = result.lineup_a if side == "A" else result.lineup_b
     _page_header(slide, f"核心球员 TOP 5 · {team.name_zh}", f"Key Players · {team.name_en}",
-                 10 if side == "A" else 11, team_a=team, team_b=team)
+                 11 if side == "A" else 12, team_a=team, team_b=team)
 
-    # Top 5 by rating — sort with rank, then re-order by original position
-    key_players = sorted(lineup.players, key=lambda p: p.rating, reverse=True)[:5]
+    # Top 5 by rating — only players with a real photo get a card.
+    key_players = [p for p in sorted(lineup.players, key=lambda p: p.rating, reverse=True) if player_has_photo(p)][:5]
     # Save the rank for each player (1 = top)
     rating_rank = {id(p): i + 1 for i, p in enumerate(key_players)}
+
+    if not key_players:
+        _add_textbox(slide, MARGIN, Inches(2.0), Inches(12), Inches(0.5),
+                    "暂无球员照片数据  ·  No player photos available",
+                    font_size=Pt(14), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
+        return
 
     # Render cards in the original squad order so the visual lineup doesn't
     # jump around, but overlay the rank badge.
@@ -946,7 +1005,7 @@ def _page_key_players(prs, result: PredictionResult, side: str = "A") -> None:
 def _page_key_matchups(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "关键对位 1v1", "Key Matchups", 12,
+    _page_header(slide, "关键对位 1v1", "Key Matchups", 13,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     # #12 Color + icon for each duel type
@@ -956,7 +1015,14 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
         2: (RGBColor(0x00, 0xD4, 0xFF), "边路竞速", "Wing Race", "»"),
         3: (RGBColor(0x7D, 0xCE, 0x82), "门线对决", "Keeper Duel", "⛔"),
     }
-    matchups = result.key_matchups
+    # Only render matchups where both players have a real photo on disk.
+    matchups = [mu for mu in result.key_matchups if player_has_photo(mu.player_a) and player_has_photo(mu.player_b)]
+    if not matchups:
+        _add_textbox(slide, MARGIN, Inches(2.0), Inches(12), Inches(0.5),
+                    "暂无对位球员照片数据  ·  No matchup player photos available",
+                    font_size=Pt(14), color=GREY, font_name=FONT_CN_BODY, align=PP_ALIGN.CENTER)
+        return
+
     for i, mu in enumerate(matchups):
         col = i % 2
         row = i // 2
@@ -1021,7 +1087,7 @@ def _page_key_matchups(prs, result: PredictionResult) -> None:
 def _page_squad_depth(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "阵容深度", "Squad Depth", 13,
+    _page_header(slide, "阵容深度", "Squad Depth", 14,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     path = CHART_DIR / "depth.png"
@@ -1077,7 +1143,7 @@ def _page_squad_depth(prs, result: PredictionResult) -> None:
 def _page_radar(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "球队能力对比", "Team Capabilities", 14,
+    _page_header(slide, "球队能力对比", "Team Capabilities", 15,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     path = CHART_DIR / "radar.png"
@@ -1110,7 +1176,7 @@ def _page_radar(prs, result: PredictionResult) -> None:
 def _page_qualitative(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "定性因子 + 比赛环境", "Qualitative & Match Environment", 15,
+    _page_header(slide, "定性因子 + 比赛环境", "Qualitative & Match Environment", 16,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     path = CHART_DIR / "qualitative.png"
@@ -1139,11 +1205,15 @@ def _page_qualitative(prs, result: PredictionResult) -> None:
          GREEN if sa.fouls_per_game < sb.fouls_per_game else CYAN),
         ("定位球进球占比  ·  Set Piece Goals", f"{sa.set_piece_goals_pct:.0%}", f"{sb.set_piece_goals_pct:.0%}",
          GREEN if sa.set_piece_goals_pct > sb.set_piece_goals_pct else CYAN),
-        ("平均控球率  ·  Possession", f"{sa.possession_avg:.0%}", f"{sb.possession_avg:.0%}",
-         GREEN if sa.possession_avg > sb.possession_avg else CYAN),
         ("逼抢强度  ·  Pressing", f"{sa.pressing_intensity:.0%}", f"{sb.pressing_intensity:.0%}",
          GREEN if sa.pressing_intensity > sb.pressing_intensity else CYAN),
     ]
+    # Possession is only available when event-level data has been ingested.
+    if sa.possession_avg is not None and sb.possession_avg is not None:
+        metrics.append(
+            ("平均控球率  ·  Possession", f"{sa.possession_avg:.0%}", f"{sb.possession_avg:.0%}",
+             GREEN if sa.possession_avg > sb.possession_avg else CYAN)
+        )
     for i, (label, va, vb, _) in enumerate(metrics):
         ry = y_r + Inches(0.5) + i * Inches(0.40)
         _add_textbox(slide, right_x + Inches(0.2), ry, Inches(3.5), Inches(0.18),
@@ -1198,46 +1268,41 @@ def _page_qualitative(prs, result: PredictionResult) -> None:
 def _page_model_output(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "三模型概率对比", "Model Output Comparison", 16,
+    _page_header(slide, "模型输出", "Model Output", 17,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     path = CHART_DIR / "probs.png"
     probability_bars(result.model_probs, path)
     slide.shapes.add_picture(str(path), MARGIN, Inches(1.5), width=Inches(8.5))
 
-    # Right: numeric table — 4 cards, each 0.95 tall (was 0.75, too cramped)
+    # Right: single-model summary + transparency fields
     y = Inches(1.6)
     p = result.model_probs
-    for i, (label_zh, label_en, vals, color) in enumerate([
-        ("ELO 模型", "ELO Model", p.elo, GOLD),
-        ("Poisson 模型", "Poisson Model", p.poisson, CYAN),
-        ("XGBoost 模型", "XGBoost Model", p.ml, GREEN),
-        ("综合概率", "Consensus", p.consensus, RED),
+    vals = p.win_draw_loss
+    for i, (label_zh, label_en, val, color) in enumerate([
+        ("主胜", "Win", vals[0], GREEN),
+        ("平局", "Draw", vals[1], GREY),
+        ("客胜", "Loss", vals[2], RED),
     ]):
         ry = y + Inches(i * 0.95)
         _add_panel(slide, MARGIN + Inches(9.0), ry, Inches(3.1), Inches(0.85), fill=BG_CARD)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.05), Inches(2.9), Inches(0.28),
                     f"{label_zh}  ·  {label_en}", font_size=Pt(12), color=color, bold=True, font_name=FONT_CN_BODY)
         _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.35), Inches(2.9), Inches(0.30),
-                    f"{vals[0]:.0%}  /  {vals[1]:.0%}  /  {vals[2]:.0%}",
-                    font_size=Pt(14), color=WHITE, bold=True, font_name=FONT_MONO)
-        _add_textbox(slide, MARGIN + Inches(9.1), ry + Inches(0.65), Inches(2.9), Inches(0.18),
-                    "胜 / 平 / 负  ·  Win / Draw / Loss", font_size=Pt(8), color=GREY, font_name=FONT_CN_BODY)
+                    f"{val:.1%}",
+                    font_size=Pt(18), color=WHITE, bold=True, font_name=FONT_MONO)
 
-    # #11 模型分歧度 + #7 市场隐含概率对比
-    y_div = Inches(5.5)
-    _add_panel(slide, MARGIN + Inches(9.0), y_div, Inches(3.1), Inches(1.3), fill=BG_PANEL)
-    _add_textbox(slide, MARGIN + Inches(9.1), y_div + Inches(0.05), Inches(2.9), Inches(0.3),
-                "模型分歧度  ·  DIVERGENCE", font_size=Pt(10), color=GOLD, font_name=FONT_CN_BODY, bold=True)
-    div_pct = p.divergence * 100  # convert to scale of 0-1
-    div_label = "极低" if div_pct < 0.5 else ("低" if div_pct < 2 else ("中" if div_pct < 5 else "高"))
-    div_color = GREEN if div_pct < 0.5 else (GOLD if div_pct < 5 else RED)
-    _add_textbox(slide, MARGIN + Inches(9.1), y_div + Inches(0.35), Inches(2.9), Inches(0.4),
-                f"σ² = {p.divergence:.4f}  ({div_label})", font_size=Pt(13), bold=True,
-                color=div_color, font_name=FONT_MONO)
-    _add_textbox(slide, MARGIN + Inches(9.1), y_div + Inches(0.75), Inches(2.9), Inches(0.4),
-                f"市场 vs 模型  ·  差 {p.market_consensus_gap:+.1%}",
-                font_size=Pt(9), color=GREY, font_name=FONT_CN_BODY)
+    # Data transparency block
+    y_trans = Inches(4.5)
+    _add_panel(slide, MARGIN + Inches(9.0), y_trans, Inches(3.1), Inches(2.0), fill=BG_PANEL)
+    _add_textbox(slide, MARGIN + Inches(9.1), y_trans + Inches(0.05), Inches(2.9), Inches(0.3),
+                "数据透明度  ·  DATA TRANSPARENCY", font_size=Pt(10), color=GOLD, font_name=FONT_CN_BODY, bold=True)
+    _add_textbox(slide, MARGIN + Inches(9.1), y_trans + Inches(0.4), Inches(2.9), Inches(0.25),
+                f"数据质量  ·  Quality: {p.data_quality:.0%}", font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
+    _add_textbox(slide, MARGIN + Inches(9.1), y_trans + Inches(0.7), Inches(2.9), Inches(0.25),
+                f"样本量  ·  Samples: {p.sample_size_a} / {p.sample_size_b}", font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
+    _add_textbox(slide, MARGIN + Inches(9.1), y_trans + Inches(1.0), Inches(2.9), Inches(0.25),
+                f"ELO 先验权重  ·  Prior: {p.elo_prior_weight:.0%}", font_size=Pt(10), color=WHITE, font_name=FONT_CN_BODY)
 
     _add_textbox(slide, MARGIN, Inches(6.6), Inches(8), Inches(0.4),
                 f"预期进球  ·  Expected Goals:  {p.expected_goals[0]:.2f}  —  {p.expected_goals[1]:.2f}",
@@ -1247,7 +1312,7 @@ def _page_model_output(prs, result: PredictionResult) -> None:
 def _page_monte_carlo(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "蒙特卡洛模拟", "Monte Carlo Simulation", 17,
+    _page_header(slide, "蒙特卡洛模拟", "Monte Carlo Simulation", 18,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     path = CHART_DIR / "mc.png"
@@ -1356,14 +1421,14 @@ def _page_monte_carlo(prs, result: PredictionResult) -> None:
 def _page_sensitivity(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "敏感性分析", "Sensitivity Analysis", 18,
+    _page_header(slide, "敏感性分析", "Sensitivity Analysis", 19,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     _add_textbox(slide, MARGIN, Inches(1.2), Inches(12), Inches(0.4),
                 "若以下变量翻转，结论是否会改变？", font_size=Pt(12), color=GREY, font_name=FONT_CN_BODY)
 
     # Compute sensitivity: how much each factor moves the consensus
-    base = result.model_probs.consensus[0]
+    base = result.model_probs.win_draw_loss[0]
     factors = [
         ("ELO +50", abs(50 * 0.0015), 0.95),
         ("伤停恢复", 0.07, 0.75),
@@ -1396,7 +1461,7 @@ def _page_sensitivity(prs, result: PredictionResult) -> None:
 def _page_final(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "最终预测", "Final Prediction", 19,
+    _page_header(slide, "最终预测", "Final Prediction", 20,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     team_a = result.match.team_a
@@ -1425,7 +1490,7 @@ def _page_final(prs, result: PredictionResult) -> None:
                 "信心指数  ·  CONFIDENCE", font_size=Pt(12), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(4.3), Inches(5.5), Inches(1.0),
                 f"{conf_zh}  ·  {result.confidence.upper()}", font_size=Pt(40), bold=True, color=conf_color, font_name=FONT_CN_BODY)
-    p = result.model_probs.consensus
+    p = result.model_probs.win_draw_loss
     _add_textbox(slide, MARGIN + Inches(0.3), Inches(5.3), Inches(5.5), Inches(0.4),
                 f"胜 {p[0]:.0%}  ·  平 {p[1]:.0%}  ·  负 {p[2]:.0%}",
                 font_size=Pt(12), color=WHITE, font_name=FONT_CN_BODY)
@@ -1454,15 +1519,18 @@ def _page_final(prs, result: PredictionResult) -> None:
 def _page_appendix(prs, result: PredictionResult) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     _bg(slide)
-    _page_header(slide, "附录", "Appendix", 20,
+    _page_header(slide, "附录", "Appendix", 21,
                  team_a=result.match.team_a, team_b=result.match.team_b)
 
     _add_textbox(slide, MARGIN, Inches(1.4), Inches(12), Inches(0.4),
                 "数据来源  ·  DATA SOURCES", font_size=Pt(13), color=GOLD, font_name=FONT_CN_BODY, bold=True)
     sources = [
         "Wikipedia REST API  ·  球员信息和照片",
-        "football-data.org  ·  球队国际比赛历史",
-        "ESPN 公开 API  ·  实时赛程（已切换为主源）",
+        "StatsBomb Open Data  ·  2018/2022 世界杯逐球 xG",
+        "martj42 国际比赛 CSV  ·  各国 1872+ 比赛结果",
+        "ESPN 公开 API  ·  实时赛程（主源）",
+        "懂球帝 api.dongqiudi.com  ·  免 Key 中文赛程 / 比赛详情",
+        "直播吧 s.qiumibao.com  ·  24h 中文体育热点（赛前情报）",
         "本地种子阵容  ·  各国阵容种子库",
         "World Football ELO Ratings  ·  ELO 评分方法",
     ]
@@ -1511,23 +1579,24 @@ def build_ppt(result: PredictionResult, lang: str = "bilingual", output_path: Pa
     _page_cover(prs, result)                  # 1
     _page_summary(prs, result)                # 2
     _page_toc(prs, result)                    # 3  (#16)
-    _page_world_cup_context(prs, result)     # 4  (#7)
-    _page_team_profile(prs, result)           # 5
-    _page_h2h(prs, result)                   # 6  (#5)
-    _page_recent_form(prs, result)            # 7
-    _page_predicted_lineup(prs, result, "A")  # 8
-    _page_predicted_lineup(prs, result, "B")  # 9
-    _page_key_players(prs, result, "A")       # 10
-    _page_key_players(prs, result, "B")       # 11
-    _page_key_matchups(prs, result)           # 12
-    _page_squad_depth(prs, result)            # 13
-    _page_radar(prs, result)                  # 14
-    _page_qualitative(prs, result)            # 15
-    _page_model_output(prs, result)           # 16
-    _page_monte_carlo(prs, result)            # 17
-    _page_sensitivity(prs, result)            # 18
-    _page_final(prs, result)                  # 19
-    _page_appendix(prs, result)               # 20
+    _page_pre_match_news(prs, result)          # 4  赛前热点
+    _page_world_cup_context(prs, result)     # 5  (#7)
+    _page_team_profile(prs, result)           # 6
+    _page_h2h(prs, result)                   # 7  (#5)
+    _page_recent_form(prs, result)            # 8
+    _page_predicted_lineup(prs, result, "A")  # 9
+    _page_predicted_lineup(prs, result, "B")  # 10
+    _page_key_players(prs, result, "A")       # 11
+    _page_key_players(prs, result, "B")       # 12
+    _page_key_matchups(prs, result)           # 13
+    _page_squad_depth(prs, result)            # 14
+    _page_radar(prs, result)                  # 15
+    _page_qualitative(prs, result)            # 16
+    _page_model_output(prs, result)           # 17
+    _page_monte_carlo(prs, result)            # 18
+    _page_sensitivity(prs, result)            # 19
+    _page_final(prs, result)                  # 20
+    _page_appendix(prs, result)               # 21
 
     if output_path is None:
         team_a_zh = result.match.team_a.name_zh

@@ -1,10 +1,8 @@
 """Generate 1v1 player matchups for the key page.
 
-Picks the most interesting duels:
-- Star striker vs opposing central defender
-- Creative midfielder vs defensive midfielder
-- Speed winger vs fullback
-- Captain / leader matchup
+Picks duels strictly from players who actually play the relevant position. If
+a slot cannot be filled because no player in the lineup occupies that
+position, the slot is simply skipped — we never invent a position match.
 """
 from __future__ import annotations
 
@@ -62,42 +60,30 @@ def generate_matchups(
             _pair("中场大脑 · 创造者 vs 清道夫", "Playmaker vs Anchor", cam, cdm)
         )
 
-    # Speed winger (A) vs fullback (B) — fall back to any wide attacker / defender
-    # so we always produce this row even if formation has no pure wingers.
+    # Speed winger (A) vs fullback (B) — only when the formation actually has
+    # players in those positions.
     winger = _best_at(pl_a, ["RW", "LW", "RM", "LM", "RAM", "LAM"])
-    if winger is None:
-        winger = _best_at(pl_a, ["ST", "CF", "CAM"])  # any attacking threat
     fb = _best_at(pl_b, ["RB", "LB", "RWB", "LWB"])
-    if fb is None:
-        fb = _best_at(pl_b, ["CB", "CDM"])
     if winger and fb:
         matchups.append(
             _pair("边路狂飙 · 边锋 vs 边后卫", "Winger vs Fullback", winger, fb)
         )
 
-    # Goalkeeper duel — best keeper by rating (fall back to defender if no GK)
+    # Goalkeeper duel — both sides must have a real keeper.
     gk_a = _best_at(pl_a, ["GK"])
-    if gk_a is None:
-        gk_a = _best_at(pl_a, ["CB"])
     gk_b = _best_at(pl_b, ["GK"])
-    if gk_b is None:
-        gk_b = _best_at(pl_b, ["CB"])
     if gk_a and gk_b:
         matchups.append(
             _pair("最后一道防线 · 门将对决", "Last Line · Keeper Duel", gk_a, gk_b)
         )
 
-    # If we still have fewer than 3, pad with generic best-vs-best matchups
-    while len(matchups) < 3:
-        # Add a fallback: best midfielder A vs best midfielder B
-        ma = _best_at(pl_a, ["CM", "CAM", "CDM"])
-        mb = _best_at(pl_b, ["CM", "CAM", "CDM"])
-        if ma and mb and (not matchups or matchups[-1].player_a.id != ma.id):
-            matchups.append(
-                _pair("中场争夺战 · 中场 vs 中场", "Midfield Battle", ma, mb)
-            )
-        else:
-            break
+    # Midfield duel — only when both sides field central mids.
+    ma = _best_at(pl_a, ["CM", "CAM", "CDM"])
+    mb = _best_at(pl_b, ["CM", "CAM", "CDM"])
+    if ma and mb:
+        matchups.append(
+            _pair("中场争夺战 · 中场 vs 中场", "Midfield Battle", ma, mb)
+        )
 
     logger.info(f"Generated {len(matchups)} key matchups")
     return matchups[:4]

@@ -1,4 +1,8 @@
-"""Team data loader with Wikipedia fallback."""
+"""Team data loader.
+
+Loads team seed data from data/teams.json. There is no fallback to other
+sources: missing team codes raise KeyError so the operator can fix the seed.
+"""
 from __future__ import annotations
 
 import json

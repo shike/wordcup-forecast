@@ -1,0 +1,19 @@
+[
+  {"id": "tur-1", "name": "Mert Günok", "name_zh": "梅尔特·居诺克", "position": "GK", "number": 1, "age": 35, "club": "Beşiktaş", "caps": 76, "goals": 0, "rating": 6.8, "preferred_foot": "R", "height_cm": 196},
+  {"id": "tur-2", "name": "Ferdi Kadıoğlu", "name_zh": "费尔迪·卡迪奥卢", "position": "LB", "number": 18, "age": 25, "club": "Fenerbahçe", "caps": 32, "goals": 1, "rating": 7.4, "preferred_foot": "L", "height_cm": 184},
+  {"id": "tur-3", "name": "Çağlar Söyüncü", "name_zh": "恰拉尔·瑟因居", "position": "CB", "number": 3, "age": 28, "club": "Fenerbahçe", "caps": 58, "goals": 4, "rating": 7.5, "preferred_foot": "R", "height_cm": 187},
+  {"id": "tur-4", "name": "Merih Demiral", "name_zh": "梅里赫·德米拉尔", "position": "CB", "number": 4, "age": 27, "club": "Al-Ahli", "caps": 49, "goals": 3, "rating": 7.3, "preferred_foot": "R", "height_cm": 190},
+  {"id": "tur-5", "name": "Mert Müldür", "name_zh": "梅尔特·穆尔德尔", "position": "RB", "number": 2, "age": 26, "club": "Fenerbahçe", "caps": 30, "goals": 0, "rating": 7.0, "preferred_foot": "R", "height_cm": 180},
+  {"id": "tur-6", "name": "Hakan Çalhanoğlu", "name_zh": "哈坎·恰尔汗奥卢", "position": "CDM", "number": 10, "age": 31, "club": "Inter", "caps": 95, "goals": 18, "rating": 8.0, "preferred_foot": "R", "height_cm": 178},
+  {"id": "tur-7", "name": "Okay Yokuşlu", "name_zh": "奥凯·尤库什卢", "position": "CM", "number": 5, "age": 31, "club": "West Brom", "caps": 65, "goals": 1, "rating": 6.9, "preferred_foot": "R", "height_cm": 191},
+  {"id": "tur-8", "name": "Arda Güler", "name_zh": "阿尔达·居莱尔", "position": "CAM", "number": 8, "age": 20, "club": "Real Madrid", "caps": 22, "goals": 5, "rating": 7.6, "preferred_foot": "L", "height_cm": 176},
+  {"id": "tur-9", "name": "Kerem Aktürkoğlu", "name_zh": "凯雷姆·阿克图尔科卢", "position": "LW", "number": 7, "age": 25, "club": "Benfica", "caps": 27, "goals": 7, "rating": 7.4, "preferred_foot": "R", "height_cm": 175},
+  {"id": "tur-10", "name": "Cenk Tosun", "name_zh": "詹克·托松", "position": "ST", "number": 9, "age": 33, "club": "Beşiktaş", "caps": 52, "goals": 21, "rating": 6.7, "preferred_foot": "R", "height_cm": 184},
+  {"id": "tur-11", "name": "Yunus Akgün", "name_zh": "尤努斯·阿克金", "position": "RW", "number": 11, "age": 25, "club": "Leicester", "caps": 23, "goals": 4, "rating": 6.9, "preferred_foot": "R", "height_cm": 177},
+  {"id": "tur-12", "name": "Altay Bayındır", "name_zh": "阿尔塔伊·巴因德尔", "position": "GK", "number": 23, "age": 27, "club": "Man Utd", "caps": 11, "goals": 0, "rating": 6.5, "preferred_foot": "R", "height_cm": 198},
+  {"id": "tur-13", "name": "Samet Akaydin", "name_zh": "萨梅特·阿卡伊丁", "position": "CB", "number": 14, "age": 30, "club": "Fenerbahçe", "caps": 24, "goals": 1, "rating": 6.6, "preferred_foot": "R", "height_cm": 184},
+  {"id": "tur-14", "name": "İsmail Yüksek", "name_zh": "伊斯梅尔·于克塞克", "position": "CM", "number": 6, "age": 26, "club": "Fenerbahçe", "caps": 18, "goals": 0, "rating": 6.5, "preferred_foot": "R", "height_cm": 183},
+  {"id": "tur-15", "name": "Yusuf Yazıcı", "name_zh": "尤素夫·亚泽哲", "position": "CAM", "number": 17, "age": 28, "club": "Lille", "caps": 47, "goals": 8, "rating": 6.8, "preferred_foot": "R", "height_cm": 183},
+  {"id": "tur-16", "name": "Cenk Şahin", "name_zh": "詹克·沙欣", "position": "RW", "number": 19, "age": 30, "club": "Galatasaray", "caps": 16, "goals": 1, "rating": 6.4, "preferred_foot": "R", "height_cm": 180},
+  {"id": "tur-17", "name": "Cenk Tosun", "name_zh": "詹克·托松", "position": "ST", "number": 19, "age": 33, "club": "Beşiktaş", "caps": 52, "goals": 21, "rating": 6.7, "preferred_foot": "R", "height_cm": 184}
+]

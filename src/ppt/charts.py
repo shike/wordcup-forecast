@@ -78,25 +78,42 @@ def _setup_axis(ax) -> None:
 
 
 def probability_bars(probs: ModelProbabilities, save_path: Path) -> Path:
-    """Three-model probability bar chart for team A."""
+    """Single-model probability bar chart for team A with data-quality badge."""
     fig, ax = plt.subplots(figsize=(8, 4.5), facecolor=BG)
     _setup_axis(ax)
-    models = ["ELO\nELO 模型", "Poisson\nPoisson 模型", "XGBoost\nXGBoost 模型", "Consensus\n综合概率"]
-    win = [probs.elo[0], probs.poisson[0], probs.ml[0], probs.consensus[0]]
-    draw = [probs.elo[1], probs.poisson[1], probs.ml[1], probs.consensus[1]]
-    loss = [probs.elo[2], probs.poisson[2], probs.ml[2], probs.consensus[2]]
 
-    x = np.arange(len(models))
-    w = 0.25
-    ax.bar(x - w, win, w, color=GREEN, label="胜 Win")
-    ax.bar(x, draw, w, color=GREY, label="平 Draw")
-    ax.bar(x + w, loss, w, color=RED, label="负 Loss")
+    labels = ["胜\nWin", "平\nDraw", "负\nLoss"]
+    values = list(probs.win_draw_loss)
+    colors = [GREEN, GREY, RED]
+    x = np.arange(len(labels))
+    bars = ax.bar(x, values, color=colors, width=0.5)
+    for bar, val in zip(bars, values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.02,
+            f"{val:.1%}",
+            ha="center", va="bottom", color=TEXT, fontsize=14, weight="bold",
+        )
+
     ax.set_xticks(x)
-    ax.set_xticklabels(models, color=TEXT, fontsize=10)
+    ax.set_xticklabels(labels, color=TEXT, fontsize=12)
     ax.set_ylim(0, 1)
     ax.set_ylabel("概率 Probability", color=GREY)
-    ax.set_title("三模型概率对比 Model Probability Comparison", color=TEXT, fontsize=14, weight="bold", pad=12)
-    ax.legend(loc="upper right", facecolor=PANEL, edgecolor="#2A3F60", labelcolor=TEXT)
+    ax.set_title(
+        "Dixon-Coles 模型概率  ·  Model Probability",
+        color=TEXT, fontsize=14, weight="bold", pad=12,
+    )
+
+    # Data quality annotation
+    dq = getattr(probs, "data_quality", 0.0)
+    quality_text = f"数据质量 Data quality: {dq:.0%}"
+    ax.text(
+        0.98, 0.98, quality_text,
+        transform=ax.transAxes, ha="right", va="top",
+        color=GOLD if dq >= 0.8 else ("#FFD700" if dq >= 0.5 else RED),
+        fontsize=10, weight="bold",
+    )
+
     fig.tight_layout()
     fig.savefig(save_path, dpi=160, facecolor=BG)
     plt.close(fig)

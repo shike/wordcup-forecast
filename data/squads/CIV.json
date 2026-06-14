@@ -1,0 +1,18 @@
+[
+  {"id": "civ-1", "name": "Yahia Fofana", "name_zh": "叶海亚·福法纳", "position": "GK", "number": 1, "age": 24, "club": "Angers", "caps": 18, "goals": 0, "rating": 6.7, "preferred_foot": "R", "height_cm": 188},
+  {"id": "civ-2", "name": "Ghislain Konan", "name_zh": "吉斯兰·科南", "position": "LB", "number": 3, "age": 28, "club": "Al-Fayha", "caps": 38, "goals": 1, "rating": 6.9, "preferred_foot": "L", "height_cm": 178},
+  {"id": "civ-3", "name": "Odilon Kossounou", "name_zh": "奥迪隆·科苏努", "position": "CB", "number": 4, "age": 23, "club": "Bayer Leverkusen", "caps": 32, "goals": 1, "rating": 7.2, "preferred_foot": "R", "height_cm": 191},
+  {"id": "civ-4", "name": "Simon Deli", "name_zh": "西蒙·德利", "position": "CB", "number": 6, "age": 33, "club": "Adana", "caps": 42, "goals": 2, "rating": 6.6, "preferred_foot": "L", "height_cm": 190},
+  {"id": "civ-5", "name": "Serge Aurier", "name_zh": "谢尔盖·奥利耶", "position": "RB", "number": 17, "age": 31, "club": "Galatasaray", "caps": 87, "goals": 2, "rating": 7.0, "preferred_foot": "R", "height_cm": 178},
+  {"id": "civ-6", "name": "Franck Kessié", "name_zh": "弗兰克·凯西", "position": "CDM", "number": 8, "age": 28, "club": "Al-Ahli", "caps": 79, "goals": 8, "rating": 7.6, "preferred_foot": "R", "height_cm": 183},
+  {"id": "civ-7", "name": "Ibrahim Sangaré", "name_zh": "易卜拉欣·桑加雷", "position": "CM", "number": 6, "age": 27, "club": "PSV", "caps": 50, "goals": 2, "rating": 7.2, "preferred_foot": "R", "height_cm": 191},
+  {"id": "civ-8", "name": "Sébastien Haller", "name_zh": "塞巴斯蒂安·阿莱", "position": "ST", "number": 22, "age": 30, "club": "Leganes", "caps": 26, "goals": 8, "rating": 7.1, "preferred_foot": "R", "height_cm": 187},
+  {"id": "civ-9", "name": "Nicolas Pépé", "name_zh": "尼古拉·佩佩", "position": "RW", "number": 19, "age": 30, "club": "Villarreal", "caps": 47, "goals": 12, "rating": 7.0, "preferred_foot": "L", "height_cm": 183},
+  {"id": "civ-10", "name": "Max Gradel", "name_zh": "马克斯·格拉德尔", "position": "LW", "number": 7, "age": 37, "club": "Sivasspor", "caps": 97, "goals": 18, "rating": 6.5, "preferred_foot": "R", "height_cm": 175},
+  {"id": "civ-11", "name": "Jérémie Boga", "name_zh": "热雷米·博加", "position": "CAM", "number": 11, "age": 28, "club": "Nice", "caps": 26, "goals": 4, "rating": 6.8, "preferred_foot": "R", "height_cm": 174},
+  {"id": "civ-12", "name": "Badra Ali Sangaré", "name_zh": "巴德拉·阿里·桑加雷", "position": "GK", "number": 16, "age": 38, "club": "Free", "caps": 70, "goals": 0, "rating": 6.2, "preferred_foot": "R", "height_cm": 190},
+  {"id": "civ-13", "name": "Willy Boly", "name_zh": "维利·博利", "position": "CB", "number": 5, "age": 33, "club": "Nottingham", "caps": 47, "goals": 3, "rating": 6.8, "preferred_foot": "R", "height_cm": 195},
+  {"id": "civ-14", "name": "Seko Fofana", "name_zh": "塞科·福法纳", "position": "CM", "number": 8, "age": 29, "club": "Al-Nassr", "caps": 26, "goals": 1, "rating": 7.0, "preferred_foot": "R", "height_cm": 184},
+  {"id": "civ-15", "name": "Christian Kouamé", "name_zh": "克里斯蒂安·夸梅", "position": "ST", "number": 9, "age": 27, "club": "Fiorentina", "caps": 19, "goals": 3, "rating": 6.6, "preferred_foot": "R", "height_cm": 185},
+  {"id": "civ-16", "name": "Simon Deli", "name_zh": "西蒙·德利", "position": "CB", "number": 6, "age": 33, "club": "Adana", "caps": 42, "goals": 2, "rating": 6.6, "preferred_foot": "L", "height_cm": 190}
+]

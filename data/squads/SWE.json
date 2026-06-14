@@ -1,0 +1,19 @@
+[
+  {"id": "swe-1", "name": "Robin Olsen", "name_zh": "罗宾·奥尔森", "position": "GK", "number": 1, "age": 34, "club": "Aston Villa", "caps": 65, "goals": 0, "rating": 6.9, "preferred_foot": "R", "height_cm": 196},
+  {"id": "swe-2", "name": "Victor Lindelöf", "name_zh": "维克托·林德洛夫", "position": "CB", "number": 3, "age": 30, "club": "Man Utd", "caps": 76, "goals": 3, "rating": 7.4, "preferred_foot": "R", "height_cm": 187},
+  {"id": "swe-3", "name": "Joakim Nilsson", "name_zh": "约金·尼尔森", "position": "CB", "number": 5, "age": 31, "club": "Sheff Utd", "caps": 22, "goals": 1, "rating": 6.6, "preferred_foot": "R", "height_cm": 187},
+  {"id": "swe-4", "name": "Emil Holm", "name_zh": "埃米尔·霍尔姆", "position": "RB", "number": 2, "age": 24, "club": "Atalanta", "caps": 18, "goals": 0, "rating": 6.9, "preferred_foot": "R", "height_cm": 184},
+  {"id": "swe-5", "name": "Gabriel Gudmundsson", "name_zh": "加布里埃尔·古德蒙德松", "position": "LB", "number": 13, "age": 24, "club": "Lille", "caps": 14, "goals": 1, "rating": 6.7, "preferred_foot": "L", "height_cm": 178},
+  {"id": "swe-6", "name": "Albin Ekdal", "name_zh": "阿尔宾·埃克达尔", "position": "CDM", "number": 8, "age": 35, "club": "Atalanta", "caps": 70, "goals": 3, "rating": 6.8, "preferred_foot": "R", "height_cm": 187},
+  {"id": "swe-7", "name": "Emil Forsberg", "name_zh": "埃米尔·福斯贝里", "position": "CM", "number": 10, "age": 33, "club": "RB Leipzig", "caps": 84, "goals": 21, "rating": 7.3, "preferred_foot": "R", "height_cm": 179},
+  {"id": "swe-8", "name": "Dejan Kulusevski", "name_zh": "德扬·库卢塞夫斯基", "position": "RW", "number": 21, "age": 25, "club": "Tottenham", "caps": 38, "goals": 4, "rating": 7.4, "preferred_foot": "L", "height_cm": 186},
+  {"id": "swe-9", "name": "Alexander Isak", "name_zh": "亚历山大·伊萨克", "position": "ST", "number": 11, "age": 26, "club": "Newcastle", "caps": 38, "goals": 12, "rating": 8.1, "preferred_foot": "R", "height_cm": 192},
+  {"id": "swe-10", "name": "Viktor Claesson", "name_zh": "维克托·克莱松", "position": "CAM", "number": 7, "age": 32, "club": "Krasnodar", "caps": 70, "goals": 13, "rating": 7.0, "preferred_foot": "R", "height_cm": 184},
+  {"id": "swe-11", "name": "Anthony Elanga", "name_zh": "安东尼·埃兰加", "position": "LW", "number": 19, "age": 23, "club": "Nottingham", "caps": 25, "goals": 3, "rating": 7.0, "preferred_foot": "R", "height_cm": 178},
+  {"id": "swe-12", "name": "Viktor Johansson", "name_zh": "维克托·约翰松", "position": "GK", "number": 12, "age": 26, "club": "Middlesbrough", "caps": 8, "goals": 0, "rating": 6.4, "preferred_foot": "R", "height_cm": 187},
+  {"id": "swe-13", "name": "Isak Hien", "name_zh": "伊萨克·希恩", "position": "CB", "number": 4, "age": 28, "club": "Atalanta", "caps": 12, "goals": 0, "rating": 6.7, "preferred_foot": "R", "height_cm": 188},
+  {"id": "swe-14", "name": "Sebastian Larsson", "name_zh": "塞巴斯蒂安·拉尔森", "position": "CM", "number": 7, "age": 39, "club": "AIK", "caps": 132, "goals": 20, "rating": 6.5, "preferred_foot": "R", "height_cm": 178},
+  {"id": "swe-15", "name": "Jesper Karlsson", "name_zh": "耶斯佩·卡尔松", "position": "RW", "number": 17, "age": 26, "club": "Bologna", "caps": 12, "goals": 2, "rating": 6.6, "preferred_foot": "R", "height_cm": 182},
+  {"id": "swe-16", "name": "Gustav Lundgren", "name_zh": "古斯塔夫·伦德格伦", "position": "LW", "number": 18, "age": 24, "club": "Palermo", "caps": 4, "goals": 0, "rating": 6.3, "preferred_foot": "R", "height_cm": 178},
+  {"id": "swe-17", "name": "Robin Quaison", "name_zh": "罗宾·奎松", "position": "ST", "number": 9, "age": 31, "club": "Al-Arabi", "caps": 41, "goals": 6, "rating": 6.4, "preferred_foot": "R", "height_cm": 184}
+]

@@ -1,0 +1,17 @@
+[
+  {"id": "cuw-1", "name": "Eloy Room", "name_zh": "埃洛伊·鲁姆", "position": "GK", "number": 1, "age": 35, "club": "Vitesse", "caps": 47, "goals": 0, "rating": 6.7, "preferred_foot": "R", "height_cm": 190},
+  {"id": "cuw-2", "name": "Daryl Janmaat", "name_zh": "达里尔·扬马特", "position": "RB", "number": 2, "age": 35, "club": "De Graafschap", "caps": 39, "goals": 1, "rating": 6.5, "preferred_foot": "R", "height_cm": 184},
+  {"id": "cuw-3", "name": "Djevencio Erp", "name_zh": "杰文乔·埃尔普", "position": "CB", "number": 4, "age": 30, "club": "Almere", "caps": 12, "goals": 0, "rating": 6.0, "preferred_foot": "R", "height_cm": 188},
+  {"id": "cuw-4", "name": "Bradley Martis", "name_zh": "布拉德利·马蒂斯", "position": "CB", "number": 5, "age": 28, "club": "Roda JC", "caps": 8, "goals": 0, "rating": 5.9, "preferred_foot": "R", "height_cm": 188},
+  {"id": "cuw-5", "name": "Rhu-Endly Martis", "name_zh": "鲁恩德利·马蒂斯", "position": "CB", "number": 3, "age": 32, "club": "RKC", "caps": 15, "goals": 0, "rating": 6.0, "preferred_foot": "R", "height_cm": 191},
+  {"id": "cuw-6", "name": "Leandro Bacuna", "name_zh": "莱安德罗·巴库纳", "position": "CM", "number": 6, "age": 33, "club": "Reading", "caps": 36, "goals": 3, "rating": 6.4, "preferred_foot": "R", "height_cm": 178},
+  {"id": "cuw-7", "name": "Juninho Bacuna", "name_zh": "朱尼尼奥·巴库纳", "position": "CM", "number": 10, "age": 27, "club": "Rangers", "caps": 22, "goals": 1, "rating": 6.3, "preferred_foot": "R", "height_cm": 178},
+  {"id": "cuw-8", "name": "Juriaan Kastaneer", "name_zh": "尤里安·卡斯塔尼尔", "position": "LW", "number": 7, "age": 30, "club": "NAC", "caps": 18, "goals": 2, "rating": 6.2, "preferred_foot": "L", "height_cm": 178},
+  {"id": "cuw-9", "name": "Gervane Kastaneer", "name_zh": "热尔瓦内·卡斯塔尼尔", "position": "ST", "number": 9, "age": 28, "club": "ADO Den Haag", "caps": 19, "goals": 4, "rating": 6.1, "preferred_foot": "R", "height_cm": 187},
+  {"id": "cuw-10", "name": "Brandley Kuwas", "name_zh": "布兰德利·库瓦斯", "position": "RW", "number": 11, "age": 32, "club": "Oostende", "caps": 14, "goals": 1, "rating": 6.0, "preferred_foot": "R", "height_cm": 174},
+  {"id": "cuw-11", "name": "Elson Hooi", "name_zh": "埃尔森·胡伊", "position": "ST", "number": 22, "age": 35, "club": "Lommel", "caps": 28, "goals": 5, "rating": 5.9, "preferred_foot": "R", "height_cm": 178},
+  {"id": "cuw-12", "name": "Trevor Doornbusch", "name_zh": "特雷弗·多恩布什", "position": "GK", "number": 12, "age": 30, "club": "Excelsior", "caps": 8, "goals": 0, "rating": 5.8, "preferred_foot": "R", "height_cm": 190},
+  {"id": "cuw-13", "name": "Sherel Floranus", "name_zh": "谢雷尔·弗洛拉努斯", "position": "RB", "number": 13, "age": 28, "club": "Antalyaspor", "caps": 21, "goals": 0, "rating": 6.0, "preferred_foot": "R", "height_cm": 178},
+  {"id": "cuw-14", "name": "Karlo Cypriano", "name_zh": "卡洛·西普里亚诺", "position": "CM", "number": 14, "age": 30, "club": "Heracles", "caps": 11, "goals": 0, "rating": 5.9, "preferred_foot": "R", "height_cm": 184},
+  {"id": "cuw-15", "name": "Rangelo Janga", "name_zh": "兰格洛·江加", "position": "ST", "number": 15, "age": 30, "club": "Volendam", "caps": 8, "goals": 1, "rating": 5.9, "preferred_foot": "R", "height_cm": 187}
+]

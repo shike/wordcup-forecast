@@ -101,7 +101,7 @@ class TeamStats(BaseModel):
     matches_in_last_7_days: int = 1
     # #10 定位球 / 持球
     set_piece_goals_pct: float = 0.25    # 定位球进球占比
-    possession_avg: float = 0.50
+    possession_avg: float | None = None
     pressing_intensity: float = 0.50      # 0-1, 越高越积极
 
 
@@ -123,16 +123,26 @@ class MatchInput(BaseModel):
 
 
 class ModelProbabilities(BaseModel):
-    elo: tuple[float, float, float]  # win, draw, loss for team_a
-    poisson: tuple[float, float, float]
-    ml: tuple[float, float, float]
-    consensus: tuple[float, float, float]
+    """Single-model output with transparency fields.
+
+    The legacy three-model fields (elo, poisson, ml, consensus, divergence,
+    market_consensus_gap) have been removed. The prediction pipeline now uses
+    one Dixon-Coles model built from real data.
+    """
+    primary_model: str = "dixon_coles_xg"
+    win_draw_loss: tuple[float, float, float]  # win, draw, loss for team_a
     expected_goals: tuple[float, float]  # (a, b)
     confidence: Literal["high", "medium", "low"] = "medium"
-    # #11 模型分歧度：3 个模型 pairwise variance（0=完全一致）
-    divergence: float = 0.0
-    # #7 市场隐含概率（来自 Poisson 反推 vs consensus）
-    market_consensus_gap: float = 0.0  # market - consensus (positive = market more bullish A)
+
+    # Transparency: how much real data was available
+    data_quality: float = 0.0  # 0.0-1.0, share of inputs coming from real data
+    sample_size_a: int = 0
+    sample_size_b: int = 0
+    elo_prior_weight: float = 0.0  # 0.0 = pure stats, 1.0 = pure ELO
+
+    # Optional backtesting metadata
+    model_rps: float | None = None
+    calibration_error: float | None = None
 
 
 class MonteCarloResult(BaseModel):
@@ -147,13 +157,44 @@ class MonteCarloResult(BaseModel):
 
     @property
     def predicted_score(self) -> str:
-        """The single most likely exact score, e.g. '2-1'."""
-        if self.top_scores:
-            return self.top_scores[0][0]
-        # Fallback: derive from expected goals in distribution
+        """The single most likely exact score, e.g. '2-1'.
+
+        Biases the result to the match favourite: when the consensus pick
+        is a team win, returns the highest-probability score in that
+        direction; for a draw, returns the most likely X-X score.
+        """
         if not self.distribution:
             return "0-0"
+        # The caller passes consensus pick separately; for the property we
+        # fall back to the raw mode.
+        if self.top_scores:
+            return self.top_scores[0][0]
         return max(self.distribution.items(), key=lambda kv: kv[1])[0]
+
+    def predicted_score_for(self, pick: str) -> str:
+        """The most likely score that matches the consensus pick.
+
+        pick ∈ {'A', 'B', 'draw'}.
+        """
+        if not self.distribution:
+            return "0-0"
+        candidates = []
+        for score, prob in self.distribution.items():
+            try:
+                a, b = score.split("-")
+                a, b = int(a), int(b)
+            except (ValueError, AttributeError):
+                continue
+            outcome = "A" if a > b else ("B" if b > a else "draw")
+            if outcome == pick:
+                candidates.append((score, prob))
+        if candidates:
+            return max(candidates, key=lambda kv: kv[1])[0]
+        # No score matched the requested outcome (e.g. caller asked for "draw"
+        # but the distribution has no drawn score). Return the top score.
+        if self.top_scores:
+            return self.top_scores[0][0]
+        return "0-0"
 
     def split_goals(self, score: str | None = None) -> tuple[int, int]:
         """Parse a 'a-b' score string into (goals_a, goals_b)."""
@@ -198,3 +239,4 @@ class PredictionResult(BaseModel):
     recommended_pick: Literal["A", "B", "draw"]
     confidence: Literal["high", "medium", "low"]
     key_risks: list[str]
+    pre_match_news: list[str] = Field(default_factory=list)

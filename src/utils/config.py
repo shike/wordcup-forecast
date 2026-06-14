@@ -12,6 +12,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 class Config:
     football_data_api_key: str = os.getenv("FOOTBALL_DATA_API_KEY", "")
+    jisu_api_key: str = os.getenv("JISU_API_KEY", "")
     offline_mode: bool = os.getenv("OFFLINE_MODE", "false").lower() == "true"
     output_dir: Path = PROJECT_ROOT / os.getenv("OUTPUT_DIR", "./输出")
     cache_dir: Path = PROJECT_ROOT / os.getenv("CACHE_DIR", "./缓存")

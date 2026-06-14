@@ -2,10 +2,11 @@
 
 Each card has:
 - top: position badge + rating
-- centre: portrait (or placeholder)
+- centre: portrait
 - bottom: name + club
 
-If no photo is available we render a clean monogram card.
+If a player has no photo on disk the card is not rendered and the caller
+receives an error; the PPT only displays cards for players with real images.
 """
 from __future__ import annotations
 
@@ -92,6 +93,12 @@ POSITION_COLORS = {
 }
 
 
+def player_has_photo(player: Player) -> bool:
+    """Return True if the player has a usable photo on disk."""
+    photo_path = player.photo_path
+    return bool(photo_path and Path(photo_path).exists())
+
+
 def render_player_card(player: Player, size: tuple[int, int] = (320, 440), kit_color: str = "#FFB627") -> Path:
     """Render a single player card to a PNG file. Returns the path."""
     img = Image.new("RGB", size, color="#0A1628")
@@ -117,27 +124,25 @@ def render_player_card(player: Player, size: tuple[int, int] = (320, 440), kit_c
     # Portrait area
     portrait_box = (24, 80, size[0] - 24, 280)
     photo_path = player.photo_path
-    if photo_path and Path(photo_path).exists():
-        try:
-            photo = Image.open(photo_path).convert("RGBA")
-            # fit into box
-            box_w = portrait_box[2] - portrait_box[0]
-            box_h = portrait_box[3] - portrait_box[1]
-            photo.thumbnail((box_w, box_h), Image.LANCZOS)
-            # circular mask
-            mask = Image.new("L", photo.size, 0)
-            md = ImageDraw.Draw(mask)
-            md.ellipse((0, 0, photo.size[0], photo.size[1]), fill=255)
-            photo_layer = Image.new("RGBA", photo.size, (0, 0, 0, 0))
-            photo_layer.paste(photo, (0, 0), mask)
-            # paste centred in box
-            ox = portrait_box[0] + (box_w - photo.size[0]) // 2
-            oy = portrait_box[1] + (box_h - photo.size[1]) // 2
-            img.paste(photo_layer, (ox, oy), photo_layer)
-        except Exception:
-            _draw_monogram(draw, portrait_box, player)
-    else:
-        _draw_monogram(draw, portrait_box, player)
+    if not (photo_path and Path(photo_path).exists()):
+        raise FileNotFoundError(
+            f"无 {player.name} ({player.name_zh}) 的真实头像：photo_path={photo_path}。"
+            f"球员卡片只显示有真实照片的球员。"
+        )
+    photo = Image.open(photo_path).convert("RGBA")
+    box_w = portrait_box[2] - portrait_box[0]
+    box_h = portrait_box[3] - portrait_box[1]
+    photo.thumbnail((box_w, box_h), Image.LANCZOS)
+    # circular mask
+    mask = Image.new("L", photo.size, 0)
+    md = ImageDraw.Draw(mask)
+    md.ellipse((0, 0, photo.size[0], photo.size[1]), fill=255)
+    photo_layer = Image.new("RGBA", photo.size, (0, 0, 0, 0))
+    photo_layer.paste(photo, (0, 0), mask)
+    # paste centred in box
+    ox = portrait_box[0] + (box_w - photo.size[0]) // 2
+    oy = portrait_box[1] + (box_h - photo.size[1]) // 2
+    img.paste(photo_layer, (ox, oy), photo_layer)
 
     # Name (Chinese primary, English as smaller subtitle)
     f_name_cn = _load_font(22, bold=True)
@@ -183,23 +188,3 @@ def render_player_card(player: Player, size: tuple[int, int] = (320, 440), kit_c
     out = Path(f"/tmp/球员卡_{player.id}.png")
     img.save(out, "PNG")
     return out
-
-
-def _draw_monogram(draw: ImageDraw.ImageDraw, box, player: Player) -> None:
-    """Fallback portrait: circular monogram with initials and position."""
-    cx = (box[0] + box[2]) // 2
-    cy = (box[1] + box[3]) // 2
-    radius = (box[2] - box[0]) // 2 - 10
-    pos_color = POSITION_COLORS.get(player.position, "#9AB0C8")
-    draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=pos_color, outline="#FFB627", width=3)
-    # Use last 1-2 characters of Chinese name (surname)
-    if player.name_zh:
-        initials = player.name_zh[-1] if len(player.name_zh) > 1 else player.name_zh
-    else:
-        parts = player.name.split()
-        if len(parts) >= 2:
-            initials = (parts[0][0] + parts[-1][0]).upper()
-        else:
-            initials = player.name[:2].upper()
-    f = _load_font(72, bold=True)
-    draw.text((cx, cy), initials, fill="#0A1628", font=f, anchor="mm")
